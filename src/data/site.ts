@@ -1,9 +1,6 @@
 /**
  * Coordonnées et informations pratiques, relevées sur la fiche Google
  * Business de l'établissement.
- *
- * ⚠️ Seules les coordonnées GPS restent approximatives (voir TODO plus bas) :
- * « Route nationale » ne suffit pas à placer un point précis.
  */
 
 export const site = {
@@ -25,11 +22,10 @@ export const site = {
     region: "Martinique",
     country: "MQ",
   },
-  // TODO client : « Route nationale » ne suffit pas à placer un point précis.
-  // Relever les coordonnées exactes sur place ou depuis la fiche Google.
-  geo: { lat: 14.7333, lng: -60.9772 },
+  // Plus code PX7X+25, Gros-Morne — relevé directement sur place.
+  geo: { lat: 14.7126174, lng: -61.0019799 },
 
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Bambouno+Pizza+Gros-Morne",
+  mapsUrl: "https://www.google.com/maps/search/?api=1&query=14.7126174,-61.0019799",
 
   /** Service : vente à emporter uniquement (pas de salle, pas de réservation). */
   serviceType: "Vente à emporter",
