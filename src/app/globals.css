@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+/*
+ * Charte Bambouno — reprise de l'identité du menu papier :
+ * fond noir profond, rouge signature, titres italiques ultra-gras.
+ * Le site est volontairement dark-only : c'est la marque, pas une préférence.
+ */
+@theme {
+  --color-ink: #0a0a0a;
+  --color-surface: #161616;
+  --color-surface-raised: #1f1f1f;
+  --color-red: #e63329;
+  --color-red-dark: #b8241c;
+  --color-mango: #f5b841;
+  --color-leaf: #2e9e5b;
+  --color-muted: #a3a3a3;
+  --color-hairline: #2a2a2a;
+
+  /* Les variables --font-* sont injectées par next/font dans <html>. */
+  --font-display: var(--font-anton), "Archivo Black", system-ui, sans-serif;
+  --font-heading: var(--font-barlow-condensed), "Barlow", system-ui, sans-serif;
+  --font-body: var(--font-inter), system-ui, sans-serif;
+
+  --radius-card: 12px;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Le header collant ne doit pas masquer les ancres de section. */
+  scroll-padding-top: 5.5rem;
+  background-color: var(--color-ink);
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-ink);
+  color: #ffffff;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  /* Marge basse pour la barre de commande fixe sur mobile. */
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Titre de section : mot-clé en rouge, filet blanc dessous, à la largeur du texte. */
+@utility section-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
+}
+
+/* Bouton primaire : rouge, ombre rouge diffuse, pilule. */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  background-color: var(--color-red);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.875rem 1.5rem;
+  box-shadow: 0 8px 28px -8px rgba(230, 51, 41, 0.65);
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+.btn-primary:hover {
+  background-color: var(--color-red-dark);
+}
+.btn-primary:active {
+  transform: translateY(1px);
+}
+
+@utility btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-hairline);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.875rem 1.5rem;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
+}
+.btn-ghost:hover {
+  border-color: var(--color-red);
+  background-color: rgba(230, 51, 41, 0.08);
+}
+
+/* Anneau de focus visible sur fond noir, pour la navigation clavier. */
+:focus-visible {
+  outline: 2px solid var(--color-mango);
+  outline-offset: 2px;
+}
