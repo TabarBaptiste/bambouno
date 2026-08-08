@@ -24,7 +24,7 @@ export function Hero() {
         </h1>
 
         <p className="mt-5 max-w-lg text-base leading-relaxed text-muted sm:text-lg">
-          {site.tagline} Vente à emporter, tous les soirs de 17h30 à 22h.{" "}
+          {site.tagline} Vente à emporter, du lundi au samedi à partir de 17h30.{" "}
           <span className="text-mango">{site.creole}</span>
         </p>
 

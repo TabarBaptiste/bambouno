@@ -14,7 +14,7 @@ export type MenuItem = {
   description?: string;
   /** Affiché en badge sur la carte. */
   note?: string;
-  tags?: Array<"vegetarien" | "poisson" | "epice" | "sucre">;
+  tags?: Array<"vegetarien" | "poisson" | "epice" | "sucre" | "alcool">;
 };
 
 export type MenuCategory = {
@@ -473,6 +473,45 @@ export const menu: MenuCategory[] = [
       },
     ],
   },
+  {
+    id: "boissons",
+    titlePrefix: "Nos",
+    titleAccent: "boissons",
+    layout: "list",
+    items: [
+      { id: "b-jus-fruits", name: "Jus de fruits 50 cl", price: 2.5 },
+      { id: "b-mont-pele", name: "Mont Pelé 50 cl", price: 2.5 },
+      { id: "b-jus-canne", name: "Jus de canne 50 cl", price: 3 },
+      { id: "b-jus-local", name: "Jus local", price: 3 },
+      { id: "b-chanflor", name: "Chanflor 50 cl", price: 1.5 },
+      { id: "b-didier", name: "Didier 50 cl", price: 2 },
+      { id: "b-royal-soda", name: "Royal Soda 50 cl", price: 2.5 },
+      { id: "b-coca", name: "Coca-Cola 50 cl", price: 2.5 },
+      { id: "b-orangina", name: "Orangina 50 cl", price: 2.5 },
+      { id: "b-amigo", name: "Amigo 50 cl", price: 2.5 },
+      { id: "b-sprite", name: "Sprite 50 cl", price: 2.5 },
+      { id: "b-fanta", name: "Fanta 50 cl", price: 2.5 },
+      { id: "b-red-bull", name: "Red Bull", price: 2.5 },
+      { id: "b-monster", name: "Monster 50 cl", price: 3 },
+      { id: "b-vita-malt", name: "Vita Malt 33 cl", price: 2.5 },
+      { id: "b-malta-lorraine", name: "Malta Lorraine 50 cl", price: 3 },
+    ],
+  },
+  {
+    id: "bieres",
+    titlePrefix: "Nos",
+    titleAccent: "bières",
+    // Mention obligatoire dès qu'on affiche des boissons alcoolisées.
+    subtitle:
+      "La vente d'alcool est interdite aux mineurs de moins de 18 ans. L'abus d'alcool est dangereux pour la santé, à consommer avec modération.",
+    layout: "list",
+    items: [
+      { id: "bi-porter-39", name: "Porter 39", price: 3, tags: ["alcool"] },
+      { id: "bi-lorraine", name: "Bière Lorraine 25 cl", price: 2.5, tags: ["alcool"] },
+      { id: "bi-heineken", name: "Bière Heineken 25 cl", price: 2.5, tags: ["alcool"] },
+      { id: "bi-desperados", name: "Desperados 33 cl", price: 3.2, tags: ["alcool"] },
+    ],
+  },
 ];
 
 /** Index plat id → item, pour reconstruire un panier sans re-parcourir la carte. */
@@ -485,6 +524,7 @@ export const tagLabels: Record<NonNullable<MenuItem["tags"]>[number], string> = 
   poisson: "Mer",
   epice: "Épicé",
   sucre: "Sucré",
+  alcool: "Alcool",
 };
 
 export function formatPrice(price: number): string {

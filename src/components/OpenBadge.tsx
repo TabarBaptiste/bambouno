@@ -27,7 +27,7 @@ export function OpenBadge({ className = "" }: { className?: string }) {
       <span
         className={`inline-flex items-center gap-2 text-sm text-muted ${className}`}
       >
-        Service de 17h30 à 22h
+        Du lundi au samedi, à partir de 17h30
       </span>
     );
   }
