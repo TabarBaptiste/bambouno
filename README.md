@@ -34,14 +34,14 @@ npm run typecheck
 Relevées sur la fiche Google Business :
 
 - **Téléphone / WhatsApp** : `+596 696 44 41 22`
-- **Adresse** : Route nationale, 97213 Gros-Morne, Martinique
+- **Adresse** : Route nationale, 97213 Gros-Morne, Martinique (Plus code
+  `PX7X+25`)
+- **Coordonnées GPS** : `14.7126174, -61.0019799`, relevées sur place
 - **Horaires** : lundi au vendredi 17h30–22h, samedi 17h30–**23h**,
   dimanche **fermé**
 
 ## À confirmer avec le client avant mise en ligne
 
-- [ ] **Coordonnées GPS** : « Route nationale » ne suffit pas à placer un point
-      précis, le pin est approximatif (`TODO client` dans `src/data/site.ts`).
 - [ ] **Prix et compositions** : relus depuis les visuels de 2023, à faire
       valider un par un.
 - [ ] **Boissons** : vérifier que la gamme n'a pas bougé depuis les visuels
