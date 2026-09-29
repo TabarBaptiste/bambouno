@@ -79,9 +79,10 @@ des tests de parcours clavier.
   prix : le restaurant confirme le montant (`src/lib/order.ts`). Pas d'envoi accidentel. Panier et prénom survivent à
   un rechargement.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
-  et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »,
-  « Fermé », et l'heure seulement si elle est à moins d'une heure (« Ouvre à
-  17h30 », « Ouvert · ferme à 22h »).
+  et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »
+  (plus « ferme à 22h » dans la dernière heure) ou « Fermé • Ouvre à 17h30 »,
+  avec le jour quand ce n'est pas aujourd'hui (« Fermé • Ouvre lundi à
+  17h30 »).
 - **Plan Google Maps** chargé au toucher (« Afficher le plan ») : l'intégration
   dépose des cookies Google, ce qui demande le consentement du visiteur en
   France, et pèse près d'1 Mo. Le bouton « Itinéraire » ouvre la fiche Google
