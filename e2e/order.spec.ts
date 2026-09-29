@@ -152,3 +152,21 @@ test("le plan Google Maps ne se charge qu'à la demande", async ({ page }) => {
     /google\.com\/maps/,
   );
 });
+
+test("pas d'encadré jaune sur la zone atteinte par un lien d'ancre", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Menu" }).click();
+  await page.getByRole("navigation", { name: "Navigation principale" })
+    .getByRole("link", { name: "Horaires" })
+    .click();
+  await expect(page.locator("#horaires")).toBeFocused();
+  await expect(page.locator("#horaires")).toHaveCSS("outline-style", "none");
+
+  // Le clavier, lui, garde son anneau sur les vrais arrêts de tabulation.
+  await page.goto("/");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "Aller au contenu" })).toHaveCSS(
+    "outline-style",
+    "solid",
+  );
+});
