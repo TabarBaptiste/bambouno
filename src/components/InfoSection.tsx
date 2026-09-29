@@ -1,5 +1,6 @@
 import { site } from "@/data/site";
 import { HoursTable } from "@/components/HoursTable";
+import { NewTabHint } from "@/components/NewTabHint";
 import { OpenBadge } from "@/components/OpenBadge";
 import { SectionTitle } from "@/components/SectionTitle";
 import { ClockIcon, PhoneIcon, PinIcon, WhatsAppIcon } from "@/components/icons";
@@ -7,9 +8,9 @@ import { whatsappUrl } from "@/lib/order";
 
 export function InfoSection() {
   return (
-    <section id="infos" className="scroll-mt-40 border-t border-hairline py-16">
+    <section id="infos" aria-labelledby="infos-titre" className="border-t border-hairline py-16">
       <div className="mx-auto max-w-5xl px-4">
-        <SectionTitle prefix="Nous" accent="trouver" />
+        <SectionTitle id="infos-titre" prefix="Nous" accent="trouver" />
 
         <div className="mt-8 grid gap-6 lg:grid-cols-3">
           <div className="rounded-card border border-hairline bg-surface p-5">
@@ -45,6 +46,7 @@ export function InfoSection() {
               className="btn-ghost mt-4 w-full text-sm"
             >
               Itinéraire
+              <NewTabHint />
             </a>
           </div>
 
@@ -55,7 +57,7 @@ export function InfoSection() {
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-muted">
               Choisissez vos plats dans la carte, puis envoyez votre sélection sur
-              WhatsApp. On vous confirme l'heure de retrait.
+              WhatsApp. On vous confirme l&apos;heure de retrait.
             </p>
             <a
               href={whatsappUrl([])}
@@ -64,10 +66,12 @@ export function InfoSection() {
               className="btn-primary mt-4 w-full text-sm"
             >
               <WhatsAppIcon className="size-5" />
-              WhatsApp
+              Commander sur WhatsApp
+              <NewTabHint />
             </a>
             <a href={`tel:${site.phone}`} className="btn-ghost mt-2 w-full text-sm">
               <PhoneIcon className="size-4" />
+              <span className="sr-only">Appeler le </span>
               {site.phoneDisplay}
             </a>
           </div>

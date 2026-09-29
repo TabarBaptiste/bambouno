@@ -13,6 +13,8 @@ export function JsonLd() {
     "@context": "https://schema.org",
     "@type": "Restaurant",
     name: site.name,
+    url: site.url,
+    image: `${site.url}/opengraph-image`,
     description: site.description,
     servesCuisine: ["Pizza", "Crêperie", "Antillaise"],
     priceRange: "€€",

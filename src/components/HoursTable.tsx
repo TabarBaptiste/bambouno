@@ -20,22 +20,27 @@ export function HoursTable() {
   const order = [1, 2, 3, 4, 5, 6, 0];
 
   return (
-    <ul className="divide-y divide-hairline">
+    <ul className="divide-y divide-hairline" aria-label="Horaires de la semaine">
       {order.map((day) => {
         const slot = site.hours[day];
         const isToday = today === day;
         return (
           <li
             key={day}
+            aria-current={isToday ? "date" : undefined}
             className={`flex items-center justify-between py-2 text-sm ${
               isToday ? "text-white" : "text-muted"
             }`}
           >
             <span className="font-heading font-semibold uppercase tracking-wide">
               {dayNames[day]}
-              {isToday ? <span className="ml-2 text-xs text-red">aujourd'hui</span> : null}
+              {isToday ? (
+                <span className="ml-2 text-xs normal-case text-red-text">
+                  (aujourd&apos;hui)
+                </span>
+              ) : null}
             </span>
-            <span className={slot ? "" : "text-red"}>
+            <span className={slot ? "" : "text-red-text"}>
               {slot ? `${formatHour(slot.open)} – ${formatHour(slot.close)}` : "Fermé"}
             </span>
           </li>

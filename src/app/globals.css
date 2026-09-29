@@ -9,12 +9,23 @@
   --color-ink: #0a0a0a;
   --color-surface: #161616;
   --color-surface-raised: #1f1f1f;
+  /* Rouge signature : titres en grand corps, pastilles, bordures. */
   --color-red: #e63329;
+  /*
+   * Déclinaisons accessibles du rouge (WCAG AA, 4,5:1 minimum) :
+   * - red-cta : fond de bouton sous texte blanc (5,0:1 ; le rouge signature
+   *   plafonne à 4,3:1) ;
+   * - red-text : petit texte rouge sur les cartes (5,9:1 sur surface).
+   */
+  --color-red-cta: #d42d23;
   --color-red-dark: #b8241c;
+  --color-red-text: #ff5a4f;
   --color-mango: #f5b841;
   --color-leaf: #2e9e5b;
   --color-muted: #a3a3a3;
   --color-hairline: #2a2a2a;
+  /* Contour des champs et boutons : 3:1 minimum contre le fond (WCAG 1.4.11). */
+  --color-control: #737373;
 
   /* Les variables --font-* sont injectées par next/font dans <html>. */
   --font-display: var(--font-anton), "Archivo Black", system-ui, sans-serif;
@@ -24,10 +35,17 @@
   --radius-card: 12px;
 }
 
+/* Écran très bas : téléphone en paysage, ou zoom à 400 % sur ordinateur. */
+@custom-variant short (@media (max-height: 30rem));
+
 html {
   scroll-behavior: smooth;
-  /* Le header collant ne doit pas masquer les ancres de section. */
-  scroll-padding-top: 5.5rem;
+  /*
+   * Le header et la barre de filtres collants ne doivent masquer ni les
+   * ancres de section, ni l'élément qui reçoit le focus (WCAG 2.4.11).
+   * Sur mobile, la barre de filtres tient sur deux lignes.
+   */
+  scroll-padding-top: 12.5rem;
   background-color: var(--color-ink);
   color-scheme: dark;
 }
@@ -69,7 +87,7 @@ body {
   justify-content: center;
   gap: 0.5rem;
   border-radius: 999px;
-  background-color: var(--color-red);
+  background-color: var(--color-red-cta);
   color: #fff;
   font-family: var(--font-heading);
   font-weight: 600;
@@ -94,7 +112,7 @@ body {
   justify-content: center;
   gap: 0.5rem;
   border-radius: 999px;
-  border: 1px solid var(--color-hairline);
+  border: 1px solid var(--color-control);
   color: #fff;
   font-family: var(--font-heading);
   font-weight: 600;
@@ -114,4 +132,28 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-mango);
   outline-offset: 2px;
+}
+
+@media (min-width: 40rem) {
+  html {
+    scroll-padding-top: 9rem;
+  }
+}
+
+/* Même règle en bas d'écran, pour la barre de commande fixe. */
+html:has(#order-bar) {
+  scroll-padding-bottom: 9rem;
+}
+
+/*
+ * Écran très bas (téléphone en paysage, zoom à 400 %) : les éléments collants
+ * mangeraient tout l'écran. On les laisse défiler avec la page (WCAG 1.4.10).
+ */
+@media (max-height: 30rem) {
+  html {
+    scroll-padding-top: 1rem;
+  }
+  html:has(#order-bar) {
+    scroll-padding-bottom: 5rem;
+  }
 }

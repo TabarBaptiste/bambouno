@@ -24,6 +24,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(site.url),
   title: {
     default: `${site.name} — Pizzas & crêpes à emporter à ${site.address.city}`,
     template: `%s | ${site.name}`,
@@ -36,14 +37,21 @@ export const metadata: Metadata = {
     "pizza à emporter Martinique",
     "Bambouno Pizza",
   ],
+  alternates: { canonical: "/" },
+  // L'aperçu du lien (image générée dans opengraph-image.tsx) est ce que
+  // voient les clients quand le site est partagé sur WhatsApp ou Facebook.
   openGraph: {
     type: "website",
     locale: "fr_FR",
+    url: "/",
     title: `${site.name} — Pizzas & crêpes à emporter`,
     description: site.description,
     siteName: site.name,
   },
+  twitter: { card: "summary_large_image" },
   robots: { index: true, follow: true },
+  // Le numéro est déjà un lien tel: explicite ; on évite qu'iOS en crée d'autres.
+  formatDetection: { telephone: false },
 };
 
 export const viewport: Viewport = {
@@ -59,7 +67,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="fr"
       className={`${anton.variable} ${barlowCondensed.variable} ${inter.variable}`}
     >
-      <body>{children}</body>
+      <body>
+        {/* Premier arrêt clavier : sauter le header pour aller au contenu (WCAG 2.4.1). */}
+        <a
+          href="#contenu"
+          className="btn-primary sr-only z-50 focus:not-sr-only focus:fixed focus:left-4 focus:top-3"
+        >
+          Aller au contenu
+        </a>
+        {children}
+      </body>
     </html>
   );
 }
