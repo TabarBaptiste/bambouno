@@ -43,9 +43,8 @@ html {
   /*
    * Le header et la barre de filtres collants ne doivent masquer ni les
    * ancres de section, ni l'élément qui reçoit le focus (WCAG 2.4.11).
-   * Sur mobile, la barre de filtres tient sur deux lignes.
    */
-  scroll-padding-top: 12.5rem;
+  scroll-padding-top: 9.5rem;
   background-color: var(--color-ink);
   color-scheme: dark;
 }
@@ -134,15 +133,9 @@ body {
   outline-offset: 2px;
 }
 
-@media (min-width: 40rem) {
-  html {
-    scroll-padding-top: 9rem;
-  }
-}
-
 /* Même règle en bas d'écran, pour la barre de commande fixe. */
 html:has(#order-bar) {
-  scroll-padding-bottom: 9rem;
+  scroll-padding-bottom: 7rem;
 }
 
 /*

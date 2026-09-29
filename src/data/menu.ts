@@ -12,30 +12,47 @@ export type MenuItem = {
   name: string;
   price: number;
   description?: string;
+  /**
+   * Photo du plat, chemin sous /public (ex. "/menu/4-fromages.jpg").
+   * Sans photo, la vignette affiche l'illustration de la rubrique.
+   */
+  image?: string;
   /** Affiché en badge sur la carte. */
   note?: string;
   tags?: Array<"vegetarien" | "poisson" | "epice" | "sucre" | "alcool">;
 };
 
+/** Illustration de repli des vignettes, tant qu'il n'y a pas de photo. */
+export type DishVisual =
+  | "pizza-tomate"
+  | "pizza-creme"
+  | "pizza-sucree"
+  | "calzone"
+  | "friand"
+  | "crepe-salee"
+  | "crepe-sucree"
+  | "boisson"
+  | "biere";
+
 export type MenuCategory = {
   id: string;
-  /** Première partie du titre, en blanc. */
-  titlePrefix: string;
-  /** Seconde partie du titre, en rouge signature. */
-  titleAccent: string;
+  /** Titre court : on lit la carte en diagonale, pas un roman. */
+  title: string;
+  /** Nom au pluriel pour le compteur, ex. « 15 pizzas ». */
+  unit: string;
+  visual: DishVisual;
+  /** Précision utile uniquement (supplément, commande à l'avance, loi). */
   subtitle?: string;
-  /** Deux colonnes sur desktop pour les longues listes. */
-  layout?: "cards" | "list";
   items: MenuItem[];
 };
 
 export const menu: MenuCategory[] = [
   {
     id: "pizzas-tomate",
-    titlePrefix: "Pizzas",
-    titleAccent: "base sauce tomate",
-    subtitle: "Toutes nos pizzas base tomate sont garnies d'emmental râpé.",
-    layout: "cards",
+    title: "Pizzas tomate",
+    unit: "pizzas",
+    visual: "pizza-tomate",
+    subtitle: "Toutes garnies d'emmental râpé.",
     items: [
       {
         id: "p-4-fromages",
@@ -149,9 +166,9 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "pizzas-creme",
-    titlePrefix: "Pizzas",
-    titleAccent: "base crème",
-    layout: "cards",
+    title: "Pizzas crème",
+    unit: "pizzas",
+    visual: "pizza-creme",
     items: [
       {
         id: "c-savoyarde",
@@ -185,10 +202,10 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "pizzas-pecheur",
-    titlePrefix: "Pizzas",
-    titleAccent: "pêcheur",
-    subtitle: "Produits de la mer. La Langoustine est à commander à l'avance.",
-    layout: "cards",
+    title: "Pizzas pêcheur",
+    unit: "pizzas",
+    visual: "pizza-tomate",
+    subtitle: "La Langoustine est à commander à l'avance.",
     items: [
       {
         id: "pe-crevettes",
@@ -247,9 +264,9 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "calzone",
-    titlePrefix: "Nos",
-    titleAccent: "calzones",
-    layout: "cards",
+    title: "Calzones",
+    unit: "calzones",
+    visual: "calzone",
     items: [
       {
         id: "cz-classique",
@@ -269,10 +286,9 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "friands",
-    titlePrefix: "Nos",
-    titleAccent: "friands",
-    subtitle: "À emporter, chauds, pour tenir jusqu'au dîner.",
-    layout: "cards",
+    title: "Friands",
+    unit: "friands",
+    visual: "friand",
     items: [
       {
         id: "f-gros-mornaise",
@@ -308,10 +324,9 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "crepes-salees",
-    titlePrefix: "Crêpes",
-    titleAccent: "salées",
-    subtitle: "Nos crêpes portent des noms de fleurs du pays.",
-    layout: "cards",
+    title: "Crêpes salées",
+    unit: "crêpes",
+    visual: "crepe-salee",
     items: [
       {
         id: "cs-hibiscus",
@@ -382,9 +397,9 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "pizzas-sucrees",
-    titlePrefix: "Pizzas",
-    titleAccent: "sucrées",
-    layout: "cards",
+    title: "Pizzas sucrées",
+    unit: "pizzas",
+    visual: "pizza-sucree",
     items: [
       {
         id: "ps-banane",
@@ -419,10 +434,10 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "crepes-sucrees",
-    titlePrefix: "Crêpes",
-    titleAccent: "sucrées",
+    title: "Crêpes sucrées",
+    unit: "crêpes",
+    visual: "crepe-sucree",
     subtitle: "Suppléments crème chocolat, caramel liquide ou sirop d'érable : 0,50 €.",
-    layout: "list",
     items: [
       { id: "cu-nature", name: "Nature", price: 3.5, tags: ["sucre"] },
       { id: "cu-sucre", name: "Sucre", price: 3.9, tags: ["sucre"] },
@@ -475,9 +490,9 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "boissons",
-    titlePrefix: "Nos",
-    titleAccent: "boissons",
-    layout: "list",
+    title: "Boissons",
+    unit: "boissons",
+    visual: "boisson",
     items: [
       { id: "b-jus-fruits", name: "Jus de fruits 50 cl", price: 2.5 },
       { id: "b-mont-pele", name: "Mont Pelé 50 cl", price: 2.5 },
@@ -499,12 +514,12 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "bieres",
-    titlePrefix: "Nos",
-    titleAccent: "bières",
+    title: "Bières",
+    unit: "bières",
+    visual: "biere",
     // Mention obligatoire dès qu'on affiche des boissons alcoolisées.
     subtitle:
       "La vente d'alcool est interdite aux mineurs de moins de 18 ans. L'abus d'alcool est dangereux pour la santé, à consommer avec modération.",
-    layout: "list",
     items: [
       { id: "bi-porter-39", name: "Porter 39", price: 3, tags: ["alcool"] },
       { id: "bi-lorraine", name: "Bière Lorraine 25 cl", price: 2.5, tags: ["alcool"] },

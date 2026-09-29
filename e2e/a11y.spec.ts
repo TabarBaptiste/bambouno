@@ -22,19 +22,27 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
     await expectNoAxeViolations(page);
   });
 
-  test("avec un panier et le détail ouvert", async ({ page }) => {
+  test("barre de panier", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Ajouter 4 Fromages" }).click();
-    await page.getByRole("button", { name: /Voir le détail/ }).click();
-    await expect(page.getByRole("button", { name: "Vider la sélection" })).toBeVisible();
+    await expect(page.locator("#order-bar")).toBeVisible();
     // Audit limité à la barre : le reste de la page est couvert plus haut, et
     // sa position de défilement ferait varier les cibles recouvertes.
     await expectNoAxeViolations(page, "#order-bar");
   });
 
-  test("avec des filtres actifs", async ({ page }) => {
+  test("panneau du panier, avec l'erreur de prénom", async ({ page }) => {
     await page.goto("/");
-    await page.getByRole("button", { name: "Sucré" }).click();
+    await page.getByRole("button", { name: "Ajouter 4 Fromages" }).click();
+    await page.getByRole("button", { name: /Voir le panier/ }).click();
+    const cart = page.getByRole("dialog", { name: "Votre panier" });
+    await cart.getByRole("button", { name: /Commander sur WhatsApp/ }).click();
+    await expect(cart.getByText("Indiquez votre prénom")).toBeVisible();
+    await expectNoAxeViolations(page, "dialog");
+  });
+
+  test("avec une recherche active", async ({ page }) => {
+    await page.goto("/");
     await page.getByRole("searchbox").fill("banane");
     await expectNoAxeViolations(page);
   });

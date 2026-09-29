@@ -26,8 +26,8 @@ request et chaque push sur `main` :
 
 | Job | Ce qu'il bloque |
 |---|---|
-| Lint, types, tests unitaires, build | ESLint (`next/core-web-vitals` + `jsx-a11y` strict), TypeScript, Vitest (horaires, panier, recherche, intégrité de `menu.ts`), `next build` |
-| E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, panier ouvert, filtres, 404), parcours de commande au clavier, persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
+| Lint, types, tests unitaires, build | ESLint (`next/core-web-vitals` + `jsx-a11y` strict), TypeScript, Vitest (horaires, panier, message WhatsApp, recherche, intégrité de `menu.ts`), `next build` |
+| E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, barre et panneau du panier, recherche, 404), parcours de commande au clavier jusqu'à WhatsApp, prénom obligatoire, persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
 | Audit | `npm audit` sur les dépendances de production, niveau *high* et plus |
 
 Dependabot propose chaque semaine les mises à jour mineures et correctifs.
@@ -50,6 +50,11 @@ des tests de parcours clavier.
   l'élément focalisé (`scroll-padding`, WCAG 2.4.11).
 - Ajouts/retraits au panier et nombre de résultats de recherche annoncés aux
   lecteurs d'écran (régions `role="status"`).
+- Panier dans un `<dialog>` natif modal : focus piégé, Échap pour fermer, focus
+  rendu au bouton « Voir le panier ». Prénom manquant signalé par un message
+  relié au champ (`aria-invalid` + `aria-describedby`).
+- Pictos d'étiquettes nommés (`role="img"` + `<title>`) : l'information
+  n'est pas portée par l'image seule.
 - Liens WhatsApp/itinéraire signalés « nouvel onglet », bouton d'appel nommé
   même en icône seule, créole balisé `lang="gcf"`.
 - Cibles tactiles de 40 px minimum, champ de recherche en 16 px sur mobile
@@ -61,10 +66,16 @@ des tests de parcours clavier.
 
 - **Carte structurée en données** (`src/data/menu.ts`), pas en images : lisible,
   indexable par Google, et modifiable sans retoucher un visuel.
-- **Recherche et filtres** (Végé / Mer / Épicé / Sucré), cumulables.
-- **Composition de commande + WhatsApp** : le client ajoute ses plats, la barre
-  basse affiche le total, et le bouton ouvre WhatsApp avec le message déjà
-  rempli (`src/lib/order.ts`). La sélection survit à un rechargement.
+- **Rubriques en cartes** deux par deux en tête de carte, pour sauter
+  directement aux crêpes ou aux boissons.
+- **Lignes de plats** : vignette à gauche, nom + pictos (végétarien, mer,
+  épicé) + prix + ingrédients au centre, bouton « + » à droite.
+- **Recherche** insensible aux accents.
+- **Commande en deux temps** : la barre basse « Voir le panier » ouvre le
+  panier, où l'on ajuste les quantités et donne son **prénom** (obligatoire),
+  puis « Commander sur WhatsApp » ouvre le message déjà rempli
+  (`src/lib/order.ts`). Pas d'envoi accidentel. Panier et prénom survivent à
+  un rechargement.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
   et non celui du visiteur (`src/lib/hours.ts`).
 - **SEO local** : métadonnées, mots-clés « pizza Gros-Morne », et balisage
@@ -72,8 +83,6 @@ des tests de parcours clavier.
 - **Mobile-first strict**, dark-only (c'est l'identité de la marque), zoom non
   bridé, navigation clavier avec anneau de focus visible (voir
   [Accessibilité](#accessibilité)).
-- **Sommaire de la carte** défilant sur mobile, pour atteindre directement les
-  crêpes ou les boissons.
 
 ## Données de l'établissement
 
@@ -96,9 +105,11 @@ Relevées sur la fiche Google Business :
 ## À faire côté contenu
 
 Le vrai différenciateur commercial, ce sont les **photos réelles des pizzas**.
-Aucune image stock générique : tant qu'on n'a pas de photos du client, le site
-assume le parti pris typographique (fond noir, titres rouges) plutôt que
-d'afficher de fausses pizzas. Prévoir une séance photo.
+Aucune image stock générique : tant qu'on n'a pas de photos du client, chaque
+plat affiche l'illustration stylisée de sa rubrique
+(`src/components/DishIllustration.tsx`). Pour ajouter une photo : la déposer
+dans `public/menu/` (carrée, 400 px suffisent) et renseigner
+`image: "/menu/nom.jpg"` sur le plat dans `src/data/menu.ts`.
 
 ## Charte graphique
 
