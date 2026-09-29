@@ -3,6 +3,19 @@ import { site } from "@/data/site";
 
 export type CartLine = { id: string; quantity: number };
 
+/** Ne garde que des lignes qui existent encore à la carte et des quantités saines. */
+export function sanitize(value: unknown): CartLine[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry) => {
+    if (typeof entry !== "object" || entry === null) return [];
+    const { id, quantity } = entry as Partial<CartLine>;
+    if (typeof id !== "string" || !menuIndex[id]) return [];
+    if (typeof quantity !== "number" || !Number.isFinite(quantity)) return [];
+    const clamped = Math.min(Math.max(Math.floor(quantity), 1), 99);
+    return [{ id, quantity: clamped }];
+  });
+}
+
 export function cartTotal(lines: CartLine[]): number {
   return lines.reduce((sum, line) => {
     const item = menuIndex[line.id];
