@@ -149,7 +149,7 @@ export function OrderBar() {
         </div>
 
         <p className="px-4 pb-2 text-center text-xs leading-tight text-muted short:hidden">
-          Total indicatif — la commande est confirmée par {site.name} sur WhatsApp.
+          Total indicatif - la commande est confirmée par {site.name} sur WhatsApp.
         </p>
       </div>
     </>

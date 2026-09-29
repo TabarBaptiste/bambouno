@@ -21,7 +21,7 @@ export function formatHour(hhmm: string): string {
 
 /**
  * Jour de la semaine et minutes écoulées depuis minuit, dans le fuseau du
- * restaurant — pas celui du visiteur. Un client en métropole doit voir
+ * restaurant - pas celui du visiteur. Un client en métropole doit voir
  * l'ouverture réelle à Gros-Morne.
  */
 export function nowInMartinique(date = new Date()): { day: number; minutes: number } {
@@ -71,7 +71,7 @@ export function getOpenState(date = new Date()): OpenState {
       const dayLabel = offset === 1 ? "demain" : DAY_LOWER[nextDay];
       return {
         isOpen: false,
-        label: `Fermé — ouvre ${dayLabel} à ${formatHour(slot.open)}`,
+        label: `Fermé - ouvre ${dayLabel} à ${formatHour(slot.open)}`,
         nextOpenDay: nextDay,
       };
     }

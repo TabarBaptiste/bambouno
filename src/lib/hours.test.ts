@@ -48,7 +48,7 @@ describe("getOpenState", () => {
   it("ferme pile à l'heure de fermeture", () => {
     const state = getOpenState(martinique("2026-09-29T22:00:00"));
     expect(state.isOpen).toBe(false);
-    expect(state.label).toBe("Fermé — ouvre demain à 17h30");
+    expect(state.label).toBe("Fermé - ouvre demain à 17h30");
   });
 
   it("reste ouvert jusqu'à 23h le samedi", () => {
@@ -60,10 +60,10 @@ describe("getOpenState", () => {
 
   it("saute le dimanche fermé", () => {
     const saturdayNight = getOpenState(martinique("2026-10-03T23:30:00"));
-    expect(saturdayNight.label).toBe("Fermé — ouvre lundi à 17h30");
+    expect(saturdayNight.label).toBe("Fermé - ouvre lundi à 17h30");
 
     const sunday = getOpenState(martinique("2026-10-04T18:00:00"));
     expect(sunday.isOpen).toBe(false);
-    expect(sunday.label).toBe("Fermé — ouvre demain à 17h30");
+    expect(sunday.label).toBe("Fermé - ouvre demain à 17h30");
   });
 });

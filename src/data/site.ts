@@ -20,7 +20,7 @@ function resolveSiteUrl(): string {
 export const site = {
   name: "Bambouno Pizza",
   url: resolveSiteUrl(),
-  tagline: "Pizzas, crêpes & friands — cuits au feu, servis chaud.",
+  tagline: "Pizzas, crêpes & friands - cuits au feu, servis chaud.",
   creole: "Nou ka fè'y pou'w.",
   description:
     "Pizzeria à emporter à Gros-Morne, Martinique. Pizzas base tomate ou crème, pizzas pêcheur, crêpes salées et sucrées, friands et boissons. Commande par téléphone ou WhatsApp, du lundi au samedi à partir de 17h30.",
@@ -37,7 +37,7 @@ export const site = {
     region: "Martinique",
     country: "MQ",
   },
-  // Plus code PX7X+25, Gros-Morne — relevé directement sur place.
+  // Plus code PX7X+25, Gros-Morne - relevé directement sur place.
   geo: { lat: 14.7126174, lng: -61.0019799 },
 
   mapsUrl: "https://www.google.com/maps/search/?api=1&query=14.7126174,-61.0019799",

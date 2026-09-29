@@ -6,7 +6,7 @@ import { site } from "@/data/site";
  * Généré au build, dans la charte : fond noir, titre rouge. Pas de photo tant
  * qu'on n'a pas les vraies pizzas du client.
  */
-export const alt = `${site.name} — pizzas, crêpes et friands à emporter à ${site.address.city}`;
+export const alt = `${site.name} - pizzas, crêpes et friands à emporter à ${site.address.city}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
