@@ -65,6 +65,7 @@ test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async 
   const text = new URL(popup.url()).searchParams.get("text");
   expect(text).toContain("c'est Léa");
   expect(text).toContain("1 × 4 Fromages");
+  expect(text).not.toContain("€");
   await expect(cart).toBeHidden();
 });
 
@@ -115,9 +116,39 @@ test("une rubrique masquée par la recherche réapparaît au clic", async ({ pag
 
   await page
     .getByRole("navigation", { name: "Rubriques de la carte" })
-    .getByRole("link", { name: /Boissons/ })
+    .getByRole("link", { name: /boissons/i })
     .click();
 
   await expect(page.locator("#boissons")).toBeInViewport();
   await expect(page.getByRole("searchbox")).toHaveValue("");
+});
+
+test("le menu burger mène aux horaires et à l'adresse", async ({ page }) => {
+  await page.goto("/");
+  const burger = page.getByRole("button", { name: "Menu" });
+  await expect(burger).toHaveAttribute("aria-expanded", "false");
+  await burger.click();
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await nav.getByRole("link", { name: "Horaires" }).click();
+  await expect(nav).toBeHidden();
+  await expect(page.locator("#horaires")).toBeInViewport();
+
+  await burger.click();
+  await page.keyboard.press("Escape");
+  await expect(nav).toBeHidden();
+  await expect(burger).toBeFocused();
+
+  await burger.click();
+  await nav.getByRole("link", { name: "Adresse" }).click();
+  await expect(page.locator("#adresse")).toBeInViewport();
+});
+
+test("le plan Google Maps ne se charge qu'à la demande", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await page.getByRole("button", { name: "Afficher le plan" }).click();
+  await expect(page.locator("iframe[title^='Plan d']")).toHaveAttribute(
+    "src",
+    /google\.com\/maps/,
+  );
 });

@@ -40,7 +40,11 @@ export const site = {
   // Plus code PX7X+25, Gros-Morne - relevé directement sur place.
   geo: { lat: 14.7126174, lng: -61.0019799 },
 
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=14.7126174,-61.0019799",
+  /** Fiche Google Maps de l'établissement (itinéraire, avis). */
+  mapsUrl: "https://maps.app.goo.gl/yT42EQgx83vn9zfn6",
+  /** Plan intégré, centré sur les coordonnées relevées sur place. */
+  mapsEmbedUrl:
+    "https://www.google.com/maps?q=14.7126174,-61.0019799&z=16&hl=fr&output=embed",
 
   /** Service : vente à emporter uniquement (pas de salle, pas de réservation). */
   serviceType: "Vente à emporter",

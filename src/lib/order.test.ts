@@ -39,10 +39,13 @@ describe("message WhatsApp", () => {
     expect(cleanName("a".repeat(100))).toHaveLength(MAX_NAME_LENGTH);
   });
 
-  it("liste les plats et le total", () => {
-    const message = buildOrderMessage([{ id: pizza.id, quantity: 2 }]);
-    expect(message).toContain(`• 2 × ${pizza.name}`);
-    expect(message).toContain("Total :");
+  it("liste les plats, sans aucun prix", () => {
+    const message = buildOrderMessage([
+      { id: pizza.id, quantity: 2 },
+      { id: drink.id, quantity: 1 },
+    ]);
+    expect(message).toContain(`• 2 × ${pizza.name}\n• 1 × ${drink.name}`);
+    expect(message).not.toMatch(/€|total/i);
   });
 
   it("encode le message dans l'URL wa.me", () => {

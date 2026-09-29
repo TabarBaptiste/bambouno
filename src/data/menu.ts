@@ -36,8 +36,10 @@ export type DishVisual =
 
 export type MenuCategory = {
   id: string;
-  /** Titre court : on lit la carte en diagonale, pas un roman. */
-  title: string;
+  /** Titre court, en deux temps : premier mot en blanc… */
+  titlePrefix: string;
+  /** …mot-clé en rouge signature. */
+  titleAccent: string;
   /** Nom au pluriel pour le compteur, ex. « 15 pizzas ». */
   unit: string;
   visual: DishVisual;
@@ -49,7 +51,8 @@ export type MenuCategory = {
 export const menu: MenuCategory[] = [
   {
     id: "pizzas-tomate",
-    title: "Pizzas tomate",
+    titlePrefix: "Pizzas",
+    titleAccent: "tomate",
     unit: "pizzas",
     visual: "pizza-tomate",
     subtitle: "Toutes garnies d'emmental râpé.",
@@ -166,7 +169,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "pizzas-creme",
-    title: "Pizzas crème",
+    titlePrefix: "Pizzas",
+    titleAccent: "crème",
     unit: "pizzas",
     visual: "pizza-creme",
     items: [
@@ -202,7 +206,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "pizzas-pecheur",
-    title: "Pizzas pêcheur",
+    titlePrefix: "Pizzas",
+    titleAccent: "pêcheur",
     unit: "pizzas",
     visual: "pizza-tomate",
     subtitle: "La Langoustine est à commander à l'avance.",
@@ -264,7 +269,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "calzone",
-    title: "Calzones",
+    titlePrefix: "Nos",
+    titleAccent: "calzones",
     unit: "calzones",
     visual: "calzone",
     items: [
@@ -286,7 +292,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "friands",
-    title: "Friands",
+    titlePrefix: "Nos",
+    titleAccent: "friands",
     unit: "friands",
     visual: "friand",
     items: [
@@ -324,7 +331,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "crepes-salees",
-    title: "Crêpes salées",
+    titlePrefix: "Crêpes",
+    titleAccent: "salées",
     unit: "crêpes",
     visual: "crepe-salee",
     items: [
@@ -397,7 +405,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "pizzas-sucrees",
-    title: "Pizzas sucrées",
+    titlePrefix: "Pizzas",
+    titleAccent: "sucrées",
     unit: "pizzas",
     visual: "pizza-sucree",
     items: [
@@ -434,7 +443,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "crepes-sucrees",
-    title: "Crêpes sucrées",
+    titlePrefix: "Crêpes",
+    titleAccent: "sucrées",
     unit: "crêpes",
     visual: "crepe-sucree",
     subtitle: "Suppléments crème chocolat, caramel liquide ou sirop d'érable : 0,50 €.",
@@ -490,7 +500,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "boissons",
-    title: "Boissons",
+    titlePrefix: "Nos",
+    titleAccent: "boissons",
     unit: "boissons",
     visual: "boisson",
     items: [
@@ -514,7 +525,8 @@ export const menu: MenuCategory[] = [
   },
   {
     id: "bieres",
-    title: "Bières",
+    titlePrefix: "Nos",
+    titleAccent: "bières",
     unit: "bières",
     visual: "biere",
     // Mention obligatoire dès qu'on affiche des boissons alcoolisées.

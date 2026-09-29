@@ -18,7 +18,7 @@ export function CategoryGrid() {
               <DishIllustration visual={category.visual} className="size-9 shrink-0 sm:size-11" />
               <span className="min-w-0">
                 <span className="block font-heading text-base font-semibold uppercase leading-tight text-white">
-                  {category.title}
+                  {category.titlePrefix} {category.titleAccent}
                 </span>
                 <span className="block text-xs text-muted">
                   {category.items.length} {category.unit}

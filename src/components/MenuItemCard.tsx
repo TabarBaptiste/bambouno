@@ -34,7 +34,7 @@ export function MenuItemCard({ item, visual }: { item: MenuItem; visual: DishVis
   );
 
   return (
-    <li className="flex items-center gap-4 py-4">
+    <li className="flex items-start gap-4 py-4">
       <div className="relative size-16 shrink-0 overflow-hidden rounded-full sm:size-20">
         {item.image ? (
           <Image src={item.image} alt="" fill sizes="80px" className="object-cover" />
@@ -60,38 +60,40 @@ export function MenuItemCard({ item, visual }: { item: MenuItem; visual: DishVis
           <p className="mt-1 text-sm leading-snug text-muted">{item.description}</p>
         ) : null}
         {item.note ? <p className="mt-1 text-xs font-medium text-mango">{item.note}</p> : null}
-      </div>
 
-      <div className="flex shrink-0 flex-col items-center gap-1">
         {/*
-          Le « + » est toujours le même nœud DOM : le focus clavier reste en
-          place quand le compteur et le « − » apparaissent en dessous.
+          Sous le texte, « + » toujours au même endroit, à droite : on peut
+          taper deux fois vite sans que le bouton bouge. Le « − » et la
+          quantité apparaissent à sa gauche. Le « + » reste le même nœud DOM,
+          donc le focus clavier ne saute pas non plus.
         */}
-        <button
-          ref={addButton}
-          type="button"
-          onClick={() => add(item.id)}
-          aria-label={`Ajouter ${item.name}`}
-          className="flex size-11 items-center justify-center rounded-full bg-red-cta text-2xl leading-none text-white transition-colors hover:bg-red-dark"
-        >
-          <span aria-hidden>+</span>
-        </button>
-        {quantity > 0 ? (
-          <>
-            <span className="font-heading text-base font-semibold leading-none">
-              <span className="sr-only">Quantité : </span>
-              {quantity}
-            </span>
-            <button
-              type="button"
-              onClick={removeOne}
-              aria-label={`Retirer ${item.name}`}
-              className="flex size-11 items-center justify-center rounded-full border border-control text-2xl leading-none text-white transition-colors hover:border-red hover:text-red-text"
-            >
-              <span aria-hidden>−</span>
-            </button>
-          </>
-        ) : null}
+        <div className="mt-3 flex items-center justify-end gap-3">
+          {quantity > 0 ? (
+            <>
+              <button
+                type="button"
+                onClick={removeOne}
+                aria-label={`Retirer ${item.name}`}
+                className="flex size-11 items-center justify-center rounded-full border border-control text-2xl leading-none text-white transition-colors hover:border-red hover:text-red-text"
+              >
+                <span aria-hidden>−</span>
+              </button>
+              <span className="min-w-5 text-center font-heading text-lg font-semibold leading-none">
+                <span className="sr-only">Quantité : </span>
+                {quantity}
+              </span>
+            </>
+          ) : null}
+          <button
+            ref={addButton}
+            type="button"
+            onClick={() => add(item.id)}
+            aria-label={`Ajouter ${item.name}`}
+            className="flex size-11 items-center justify-center rounded-full bg-red-cta text-2xl leading-none text-white transition-colors hover:bg-red-dark"
+          >
+            <span aria-hidden>+</span>
+          </button>
+        </div>
       </div>
     </li>
   );
