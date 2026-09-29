@@ -8,7 +8,7 @@ import { getOpenState, type OpenState } from "@/lib/hours";
  *
  * Calculé côté client uniquement : le HTML est généré au build (ISR), donc un
  * statut rendu au serveur serait périmé et provoquerait une erreur
- * d'hydratation. On affiche les horaires en repli tant que le JS n'a pas pris
+ * d'hydratation. On réserve la place du badge tant que le JS n'a pas pris
  * la main - jamais un statut potentiellement faux.
  */
 export function OpenBadge({ className = "" }: { className?: string }) {
@@ -23,12 +23,13 @@ export function OpenBadge({ className = "" }: { className?: string }) {
   }, []);
 
   if (!state) {
+    // Emplacement vide de la taille du badge, le temps du calcul : pas de
+    // saut de mise en page, et jamais un statut potentiellement faux.
     return (
       <span
-        className={`inline-flex items-center gap-2 text-sm text-muted ${className}`}
-      >
-        Du lundi au samedi, à partir de 17h30
-      </span>
+        aria-hidden
+        className={`inline-block h-8 w-24 rounded-full border border-hairline bg-surface ${className}`}
+      />
     );
   }
 

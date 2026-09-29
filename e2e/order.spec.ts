@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ context }) => {
+  // Pas de vraie sortie vers WhatsApp pendant les tests.
+  await context.route("https://wa.me/**", (route) =>
+    route.fulfill({ contentType: "text/html", body: "<title>WhatsApp</title>" }),
+  );
+});
+
 test("le lien d'évitement est le premier arrêt clavier", async ({ page }) => {
   await page.goto("/");
   await page.keyboard.press("Tab");
@@ -17,16 +24,14 @@ test("le bouton d'appel a un nom accessible, même en icône seule", async ({ pa
   ).toBeVisible();
 });
 
-test("composer une commande au clavier et l'envoyer sur WhatsApp", async ({ page }) => {
+test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async ({ page }) => {
   await page.goto("/");
 
-  const addButton = page.getByRole("button", { name: "Ajouter 4 Fromages" });
-  await addButton.focus();
+  const add = page.getByRole("button", { name: "Ajouter 4 Fromages" });
+  await add.focus();
   await page.keyboard.press("Enter");
-
-  // Le bouton devient « + » sans perdre le focus clavier.
-  const plus = page.getByRole("button", { name: "Ajouter un 4 Fromages" }).first();
-  await expect(plus).toBeFocused();
+  // Le « + » ne change pas de nœud : le focus reste en place.
+  await expect(add).toBeFocused();
   await page.keyboard.press("Enter");
 
   // L'ajout est annoncé aux lecteurs d'écran.
@@ -34,29 +39,67 @@ test("composer une commande au clavier et l'envoyer sur WhatsApp", async ({ page
     /2 articles/,
   );
 
-  const bar = page.getByRole("region", { name: "Votre sélection" });
-  await expect(bar).toBeVisible();
-  const order = bar.getByRole("link", { name: /Commander sur WhatsApp/ });
-  const href = await order.getAttribute("href");
-  const text = new URL(href!).searchParams.get("text");
-  expect(text).toContain("2 × 4 Fromages");
+  // Rien ne part vers WhatsApp sans passer par le panier.
+  const openCart = page.getByRole("button", { name: /Voir le panier/ });
+  await expect(openCart).toContainText("2 articles");
+  await openCart.click();
 
-  // Retirer la dernière unité rend le focus au bouton d'ajout.
-  const minus = page.getByRole("button", { name: "Retirer un 4 Fromages" }).first();
-  await minus.click();
-  await minus.click();
-  await expect(addButton).toBeFocused();
-  await expect(bar).toBeHidden();
+  const cart = page.getByRole("dialog", { name: "Votre panier" });
+  await expect(cart).toBeVisible();
+
+  // Modifier dans le panier.
+  await cart.getByRole("button", { name: "Retirer 4 Fromages" }).click();
+  await expect(cart.getByText("Quantité : 1")).toBeAttached();
+
+  // Le prénom est obligatoire.
+  const submit = cart.getByRole("button", { name: /Commander sur WhatsApp/ });
+  await submit.click();
+  const firstName = cart.getByRole("textbox", { name: "Votre prénom" });
+  await expect(firstName).toBeFocused();
+  await expect(firstName).toHaveAttribute("aria-invalid", "true");
+
+  await firstName.fill("Léa");
+  const popupPromise = page.waitForEvent("popup");
+  await submit.click();
+  const popup = await popupPromise;
+  const text = new URL(popup.url()).searchParams.get("text");
+  expect(text).toContain("c'est Léa");
+  expect(text).toContain("1 × 4 Fromages");
+  expect(text).not.toContain("€");
+  await expect(cart).toBeHidden();
 });
 
-test("la sélection survit au rechargement", async ({ page }) => {
+test("Échap ferme le panier et rend le focus au bouton", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Ajouter 4 Fromages" }).click();
+  const openCart = page.getByRole("button", { name: /Voir le panier/ });
+  await openCart.click();
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("dialog")).toBeHidden();
+  await expect(openCart).toBeFocused();
+});
+
+test("retirer la dernière unité rend le focus au bouton d'ajout", async ({ page }) => {
+  await page.goto("/");
+  const add = page.getByRole("button", { name: "Ajouter 4 Fromages" });
+  await add.click();
+  await page.getByRole("button", { name: "Retirer 4 Fromages" }).click();
+  await expect(add).toBeFocused();
+  await expect(page.locator("#order-bar")).toBeHidden();
+});
+
+test("le panier et le prénom survivent au rechargement", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Ajouter Coca-Cola 50 cl" }).click();
-  await expect(page.getByRole("region", { name: "Votre sélection" })).toBeVisible();
+  await page.getByRole("button", { name: /Voir le panier/ }).click();
+  await page.getByRole("textbox", { name: "Votre prénom" }).fill("Marc");
   await page.reload();
-  await expect(page.getByRole("region", { name: "Votre sélection" })).toContainText(
-    "1 article",
-  );
+
+  const openCart = page.getByRole("button", { name: /Voir le panier/ });
+  await expect(openCart).toContainText("1 article");
+  await openCart.click();
+  await expect(page.getByRole("textbox", { name: "Votre prénom" })).toHaveValue("Marc");
 });
 
 test("la recherche ignore les accents", async ({ page }) => {
@@ -66,19 +109,46 @@ test("la recherche ignore les accents", async ({ page }) => {
   await expect(page.getByRole("status").filter({ hasText: /correspond/ })).toBeAttached();
 });
 
-test("un lien vers une catégorie filtrée lève les filtres", async ({ page }) => {
+test("une rubrique masquée par la recherche réapparaît au clic", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Sucré" }).click();
+  await page.getByRole("searchbox").fill("banane");
   await expect(page.locator("#boissons")).toHaveCount(0);
 
   await page
-    .getByRole("navigation", { name: "Catégories de la carte" })
-    .getByRole("link", { name: "Nos boissons" })
+    .getByRole("navigation", { name: "Rubriques de la carte" })
+    .getByRole("link", { name: /boissons/i })
     .click();
 
   await expect(page.locator("#boissons")).toBeInViewport();
-  await expect(page.getByRole("button", { name: "Sucré" })).toHaveAttribute(
-    "aria-pressed",
-    "false",
+  await expect(page.getByRole("searchbox")).toHaveValue("");
+});
+
+test("le menu burger mène aux horaires et à l'adresse", async ({ page }) => {
+  await page.goto("/");
+  const burger = page.getByRole("button", { name: "Menu" });
+  await expect(burger).toHaveAttribute("aria-expanded", "false");
+  await burger.click();
+  const nav = page.getByRole("navigation", { name: "Navigation principale" });
+  await nav.getByRole("link", { name: "Horaires" }).click();
+  await expect(nav).toBeHidden();
+  await expect(page.locator("#horaires")).toBeInViewport();
+
+  await burger.click();
+  await page.keyboard.press("Escape");
+  await expect(nav).toBeHidden();
+  await expect(burger).toBeFocused();
+
+  await burger.click();
+  await nav.getByRole("link", { name: "Adresse" }).click();
+  await expect(page.locator("#adresse")).toBeInViewport();
+});
+
+test("le plan Google Maps ne se charge qu'à la demande", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("iframe")).toHaveCount(0);
+  await page.getByRole("button", { name: "Afficher le plan" }).click();
+  await expect(page.locator("iframe[title^='Plan d']")).toHaveAttribute(
+    "src",
+    /google\.com\/maps/,
   );
 });

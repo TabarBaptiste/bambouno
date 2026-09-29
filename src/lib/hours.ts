@@ -2,11 +2,12 @@ import { site } from "@/data/site";
 
 export type OpenState = {
   isOpen: boolean;
-  /** Phrase courte prête à afficher, ex. « Ouvert jusqu'à 22h00 ». */
+  /** Libellé minimal, ex. « Ouvert » ou « Fermé • Ouvre à 17h30 ». */
   label: string;
-  /** Jour de la prochaine ouverture (0-6), utile pour l'affichage détaillé. */
-  nextOpenDay?: number;
 };
+
+/** En deçà, l'heure d'ouverture ou de fermeture mérite d'être affichée. */
+const SOON_MINUTES = 60;
 
 function toMinutes(hhmm: string): number {
   const [h, m] = hhmm.split(":").map(Number);
@@ -43,43 +44,6 @@ export function nowInMartinique(date = new Date()): { day: number; minutes: numb
   return { day: dayIndex, minutes: hour * 60 + Number(get("minute")) };
 }
 
-export function getOpenState(date = new Date()): OpenState {
-  const { day, minutes } = nowInMartinique(date);
-  const today = site.hours[day];
-
-  if (today) {
-    const open = toMinutes(today.open);
-    const close = toMinutes(today.close);
-
-    if (minutes >= open && minutes < close) {
-      return { isOpen: true, label: `Ouvert jusqu'à ${formatHour(today.close)}` };
-    }
-    if (minutes < open) {
-      return {
-        isOpen: false,
-        label: `Ouvre à ${formatHour(today.open)}`,
-        nextOpenDay: day,
-      };
-    }
-  }
-
-  // Fermé pour aujourd'hui : on cherche le prochain jour ouvré.
-  for (let offset = 1; offset <= 7; offset++) {
-    const nextDay = (day + offset) % 7;
-    const slot = site.hours[nextDay];
-    if (slot) {
-      const dayLabel = offset === 1 ? "demain" : DAY_LOWER[nextDay];
-      return {
-        isOpen: false,
-        label: `Fermé - ouvre ${dayLabel} à ${formatHour(slot.open)}`,
-        nextOpenDay: nextDay,
-      };
-    }
-  }
-
-  return { isOpen: false, label: "Fermé" };
-}
-
 const DAY_LOWER = [
   "dimanche",
   "lundi",
@@ -89,6 +53,40 @@ const DAY_LOWER = [
   "vendredi",
   "samedi",
 ] as const;
+
+/** Prochaine ouverture : « à 17h30 » aujourd'hui, sinon « lundi à 17h30 ». */
+function nextOpening(day: number, minutes: number): string {
+  const today = site.hours[day];
+  if (today && minutes < toMinutes(today.open)) return `à ${formatHour(today.open)}`;
+
+  for (let offset = 1; offset <= 7; offset++) {
+    const nextDay = (day + offset) % 7;
+    const slot = site.hours[nextDay];
+    if (slot) return `${DAY_LOWER[nextDay]} à ${formatHour(slot.open)}`;
+  }
+  return "";
+}
+
+/**
+ * Statut réduit à l'essentiel :
+ * - ouvert : « Ouvert », plus l'heure de fermeture dans la dernière heure ;
+ * - fermé : toujours « Fermé • Ouvre … » avec l'heure, ou le jour quand ce
+ *   n'est pas aujourd'hui (dimanche, ou après la fermeture du soir).
+ */
+export function getOpenState(date = new Date()): OpenState {
+  const { day, minutes } = nowInMartinique(date);
+  const today = site.hours[day];
+
+  if (today && minutes >= toMinutes(today.open) && minutes < toMinutes(today.close)) {
+    const close = toMinutes(today.close);
+    return close - minutes <= SOON_MINUTES
+      ? { isOpen: true, label: `Ouvert • ferme à ${formatHour(today.close)}` }
+      : { isOpen: true, label: "Ouvert" };
+  }
+
+  const next = nextOpening(day, minutes);
+  return { isOpen: false, label: next ? `Fermé • Ouvre ${next}` : "Fermé" };
+}
 
 /** Horaires au format schema.org OpeningHoursSpecification. */
 export function openingHoursSchema() {

@@ -32,38 +32,49 @@ describe("nowInMartinique", () => {
 });
 
 describe("getOpenState", () => {
-  it("est ouvert pendant le service", () => {
+  it("affiche juste « Ouvert » en plein service", () => {
     expect(getOpenState(martinique("2026-09-29T18:00:00"))).toEqual({
       isOpen: true,
-      label: "Ouvert jusqu'à 22h",
+      label: "Ouvert",
     });
   });
 
-  it("annonce l'ouverture du jour avant le service", () => {
-    const state = getOpenState(martinique("2026-09-29T12:00:00"));
-    expect(state.isOpen).toBe(false);
-    expect(state.label).toBe("Ouvre à 17h30");
-  });
-
-  it("ferme pile à l'heure de fermeture", () => {
-    const state = getOpenState(martinique("2026-09-29T22:00:00"));
-    expect(state.isOpen).toBe(false);
-    expect(state.label).toBe("Fermé - ouvre demain à 17h30");
-  });
-
-  it("reste ouvert jusqu'à 23h le samedi", () => {
-    expect(getOpenState(martinique("2026-10-03T22:30:00"))).toEqual({
+  it("précise l'heure de fermeture dans la dernière heure", () => {
+    expect(getOpenState(martinique("2026-09-29T21:15:00"))).toEqual({
       isOpen: true,
-      label: "Ouvert jusqu'à 23h",
+      label: "Ouvert • ferme à 22h",
     });
+  });
+
+  it("suit l'horaire du samedi (23h)", () => {
+    expect(getOpenState(martinique("2026-10-03T22:30:00")).label).toBe(
+      "Ouvert • ferme à 23h",
+    );
+  });
+
+  it("annonce l'heure d'ouverture avant le service, même loin", () => {
+    expect(getOpenState(martinique("2026-09-29T16:45:00"))).toEqual({
+      isOpen: false,
+      label: "Fermé • Ouvre à 17h30",
+    });
+    expect(getOpenState(martinique("2026-09-29T09:00:00")).label).toBe(
+      "Fermé • Ouvre à 17h30",
+    );
+  });
+
+  it("annonce le jour après la fermeture du soir", () => {
+    // Mardi 22h pile : fermé, on rouvre mercredi.
+    expect(getOpenState(martinique("2026-09-29T22:00:00")).label).toBe(
+      "Fermé • Ouvre mercredi à 17h30",
+    );
   });
 
   it("saute le dimanche fermé", () => {
-    const saturdayNight = getOpenState(martinique("2026-10-03T23:30:00"));
-    expect(saturdayNight.label).toBe("Fermé - ouvre lundi à 17h30");
-
-    const sunday = getOpenState(martinique("2026-10-04T18:00:00"));
-    expect(sunday.isOpen).toBe(false);
-    expect(sunday.label).toBe("Fermé - ouvre demain à 17h30");
+    expect(getOpenState(martinique("2026-10-03T23:30:00")).label).toBe(
+      "Fermé • Ouvre lundi à 17h30",
+    );
+    expect(getOpenState(martinique("2026-10-04T12:00:00")).label).toBe(
+      "Fermé • Ouvre lundi à 17h30",
+    );
   });
 });

@@ -1,13 +1,14 @@
+import { CategoryGrid } from "@/components/CategoryGrid";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { Hero } from "@/components/Hero";
 import { InfoSection } from "@/components/InfoSection";
 import { JsonLd } from "@/components/JsonLd";
 import { MenuBrowser } from "@/components/MenuBrowser";
-import { MenuNav } from "@/components/MenuNav";
 import { OrderBar } from "@/components/OrderBar";
 import { OrderProvider } from "@/components/OrderProvider";
 import { SectionTitle } from "@/components/SectionTitle";
+import { menu } from "@/data/menu";
 
 /**
  * Page unique : la carte tient dans un seul défilement, avec ancres.
@@ -24,17 +25,15 @@ export default function HomePage() {
 
         <section id="carte" aria-labelledby="carte-titre" tabIndex={-1} className="outline-none">
           {/*
-            MenuBrowser gère lui-même ses largeurs : sa barre de filtres collante
-            doit être pleine largeur, elle ne peut pas vivre dans ce conteneur.
+            MenuBrowser gère lui-même ses largeurs : sa barre de recherche
+            collante doit être pleine largeur, elle ne peut pas vivre ici.
           */}
           <div className="mx-auto max-w-5xl px-4">
-            <SectionTitle
-              id="carte-titre"
-              prefix="Notre"
-              accent="carte"
-              subtitle="Ajoutez vos plats, puis envoyez la sélection sur WhatsApp."
-            />
-            <MenuNav />
+            <div className="flex items-baseline justify-between gap-4">
+              <SectionTitle id="carte-titre" prefix="La" accent="carte" />
+              <p className="shrink-0 text-sm text-muted">{menu.length} rubriques</p>
+            </div>
+            <CategoryGrid />
           </div>
           <MenuBrowser />
         </section>
