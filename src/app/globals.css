@@ -133,6 +133,16 @@ body {
   outline-offset: 2px;
 }
 
+/*
+ * Pas d'anneau sur les zones où l'on arrive par un lien d'ancre (sections,
+ * titre du panier) : elles ne reçoivent le focus que par script, ce ne sont
+ * pas des arrêts de tabulation. Sans ça, cliquer sur « Horaires » encadre
+ * toute la section en jaune. Les liens et boutons gardent leur anneau.
+ */
+[tabindex="-1"]:focus-visible {
+  outline: none;
+}
+
 /* Même règle en bas d'écran, pour la barre de commande fixe. */
 html:has(#order-bar) {
   scroll-padding-bottom: 7rem;
