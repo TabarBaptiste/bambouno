@@ -1,4 +1,4 @@
-# Bambouno Pizza — site vitrine
+# Bambouno Pizza - site vitrine
 
 Site vitrine + carte dynamique pour Bambouno Pizza (Gros-Morne, Martinique).
 **Phase 1** : présenter la carte à jour et amener le client au bon canal de
@@ -133,6 +133,6 @@ production du projet est utilisé à défaut.
 
 Click & collect avec créneaux de retrait et paiement en ligne : **Supabase**
 (Postgres + Auth) et **Stripe** ou SumUp. C'est à ce moment-là qu'un CMS
-(Sanity / Payload) devient utile pour que le client change ses prix lui-même —
+(Sanity / Payload) devient utile pour que le client change ses prix lui-même -
 `src/data/menu.ts` est volontairement plat et sérialisable pour être remplacé
 par un `fetch` sans toucher aux composants.

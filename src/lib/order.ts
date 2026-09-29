@@ -29,7 +29,7 @@ export function cartCount(lines: CartLine[]): number {
 
 /**
  * Message pré-rempli pour WhatsApp. Le client n'a plus qu'à envoyer, puis à
- * préciser son prénom et son heure de retrait — volontairement pas de champ
+ * préciser son prénom et son heure de retrait - volontairement pas de champ
  * formulaire, la conversation fait le reste.
  */
 export function buildOrderMessage(lines: CartLine[]): string {
@@ -37,7 +37,7 @@ export function buildOrderMessage(lines: CartLine[]): string {
     .map((line) => {
       const item = menuIndex[line.id];
       if (!item) return null;
-      return `• ${line.quantity} × ${item.name} — ${formatPrice(item.price * line.quantity)}`;
+      return `• ${line.quantity} × ${item.name} - ${formatPrice(item.price * line.quantity)}`;
     })
     .filter(Boolean);
 

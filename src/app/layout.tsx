@@ -26,7 +26,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — Pizzas & crêpes à emporter à ${site.address.city}`,
+    default: `${site.name} - Pizzas & crêpes à emporter à ${site.address.city}`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     url: "/",
-    title: `${site.name} — Pizzas & crêpes à emporter`,
+    title: `${site.name} - Pizzas & crêpes à emporter`,
     description: site.description,
     siteName: site.name,
   },

@@ -10,7 +10,7 @@ export function Footer() {
         </p>
         <p className="mt-2 max-w-md text-sm text-muted">
           <span lang="gcf">{site.creole}</span> Pizzeria à emporter,{" "}
-          {site.address.city} — {site.address.region}.
+          {site.address.city} - {site.address.region}.
         </p>
         <p className="mt-2 text-sm">
           <a

@@ -9,7 +9,7 @@ import { getOpenState, type OpenState } from "@/lib/hours";
  * Calculé côté client uniquement : le HTML est généré au build (ISR), donc un
  * statut rendu au serveur serait périmé et provoquerait une erreur
  * d'hydratation. On affiche les horaires en repli tant que le JS n'a pas pris
- * la main — jamais un statut potentiellement faux.
+ * la main - jamais un statut potentiellement faux.
  */
 export function OpenBadge({ className = "" }: { className?: string }) {
   const [state, setState] = useState<OpenState | null>(null);
