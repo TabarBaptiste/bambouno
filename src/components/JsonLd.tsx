@@ -43,7 +43,7 @@ export function JsonLd() {
       name: `Carte ${site.name}`,
       hasMenuSection: menu.map((category) => ({
         "@type": "MenuSection",
-        name: `${category.titlePrefix} ${category.titleAccent}`,
+        name: category.title,
         hasMenuItem: category.items.map((item) => ({
           "@type": "MenuItem",
           name: item.name,
