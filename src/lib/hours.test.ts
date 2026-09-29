@@ -42,35 +42,39 @@ describe("getOpenState", () => {
   it("précise l'heure de fermeture dans la dernière heure", () => {
     expect(getOpenState(martinique("2026-09-29T21:15:00"))).toEqual({
       isOpen: true,
-      label: "Ouvert · ferme à 22h",
-    });
-  });
-
-  it("annonce l'ouverture dans l'heure qui précède", () => {
-    expect(getOpenState(martinique("2026-09-29T16:45:00"))).toEqual({
-      isOpen: false,
-      label: "Ouvre à 17h30",
-    });
-  });
-
-  it("affiche juste « Fermé » quand l'ouverture est loin", () => {
-    expect(getOpenState(martinique("2026-09-29T12:00:00")).label).toBe("Fermé");
-  });
-
-  it("ferme pile à l'heure de fermeture", () => {
-    expect(getOpenState(martinique("2026-09-29T22:00:00"))).toEqual({
-      isOpen: false,
-      label: "Fermé",
+      label: "Ouvert • ferme à 22h",
     });
   });
 
   it("suit l'horaire du samedi (23h)", () => {
     expect(getOpenState(martinique("2026-10-03T22:30:00")).label).toBe(
-      "Ouvert · ferme à 23h",
+      "Ouvert • ferme à 23h",
     );
   });
 
-  it("reste fermé le dimanche", () => {
-    expect(getOpenState(martinique("2026-10-04T17:00:00")).label).toBe("Fermé");
+  it("annonce l'heure d'ouverture avant le service, même loin", () => {
+    expect(getOpenState(martinique("2026-09-29T16:45:00"))).toEqual({
+      isOpen: false,
+      label: "Fermé • Ouvre à 17h30",
+    });
+    expect(getOpenState(martinique("2026-09-29T09:00:00")).label).toBe(
+      "Fermé • Ouvre à 17h30",
+    );
+  });
+
+  it("annonce le jour après la fermeture du soir", () => {
+    // Mardi 22h pile : fermé, on rouvre mercredi.
+    expect(getOpenState(martinique("2026-09-29T22:00:00")).label).toBe(
+      "Fermé • Ouvre mercredi à 17h30",
+    );
+  });
+
+  it("saute le dimanche fermé", () => {
+    expect(getOpenState(martinique("2026-10-03T23:30:00")).label).toBe(
+      "Fermé • Ouvre lundi à 17h30",
+    );
+    expect(getOpenState(martinique("2026-10-04T12:00:00")).label).toBe(
+      "Fermé • Ouvre lundi à 17h30",
+    );
   });
 });
