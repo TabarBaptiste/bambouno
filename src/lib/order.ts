@@ -1,4 +1,4 @@
-import { formatPrice, menuIndex } from "@/data/menu";
+import { menuIndex } from "@/data/menu";
 import { site } from "@/data/site";
 
 export type CartLine = { id: string; quantity: number };
@@ -27,36 +27,47 @@ export function cartCount(lines: CartLine[]): number {
   return lines.reduce((sum, line) => sum + line.quantity, 0);
 }
 
+/** Longueur maximale du prénom : au-delà, c'est une erreur de saisie. */
+export const MAX_NAME_LENGTH = 40;
+
+/** Prénom nettoyé : espaces superflus retirés, longueur bornée. */
+export function cleanName(name: string): string {
+  return name.replace(/\s+/g, " ").trim().slice(0, MAX_NAME_LENGTH);
+}
+
 /**
- * Message pré-rempli pour WhatsApp. Le client n'a plus qu'à envoyer, puis à
- * préciser son prénom et son heure de retrait - volontairement pas de champ
- * formulaire, la conversation fait le reste.
+ * Message pré-rempli pour WhatsApp. Le prénom permet au restaurant
+ * d'appeler le client au retrait ; l'heure se règle dans la conversation.
+ * Pas de prix : c'est le restaurant qui confirme le montant.
  */
-export function buildOrderMessage(lines: CartLine[]): string {
+export function buildOrderMessage(lines: CartLine[], name = ""): string {
   const rows = lines
     .map((line) => {
       const item = menuIndex[line.id];
       if (!item) return null;
-      return `• ${line.quantity} × ${item.name} - ${formatPrice(item.price * line.quantity)}`;
+      return `• ${line.quantity} × ${item.name}`;
     })
     .filter(Boolean);
 
+  const firstName = cleanName(name);
+  const greeting = firstName
+    ? `Bonjour ${site.name}, c'est ${firstName} 👋`
+    : `Bonjour ${site.name} 👋`;
+
   if (rows.length === 0) {
-    return `Bonjour ${site.name}, je voudrais passer une commande.`;
+    return `${greeting}\n\nJe voudrais passer une commande.`;
   }
 
   return [
-    `Bonjour ${site.name} 👋`,
+    greeting,
     "",
     "Je voudrais commander :",
     ...rows,
-    "",
-    `Total indicatif : ${formatPrice(cartTotal(lines))}`,
     "",
     "À quelle heure puis-je venir récupérer ?",
   ].join("\n");
 }
 
-export function whatsappUrl(lines: CartLine[]): string {
-  return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(buildOrderMessage(lines))}`;
+export function whatsappUrl(lines: CartLine[], name = ""): string {
+  return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(buildOrderMessage(lines, name))}`;
 }
