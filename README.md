@@ -69,15 +69,23 @@ des tests de parcours clavier.
 - **Rubriques en cartes** deux par deux en tête de carte, pour sauter
   directement aux crêpes ou aux boissons.
 - **Lignes de plats** : vignette à gauche, nom + pictos (végétarien, mer,
-  épicé) + prix + ingrédients au centre, bouton « + » à droite.
+  épicé) + prix + ingrédients, et sous le texte le bouton « + », fixe à
+  droite pour pouvoir taper vite ; « − » et quantité apparaissent à sa gauche.
+- **Menu burger** dans le header : la carte, les horaires, l'adresse.
 - **Recherche** insensible aux accents.
 - **Commande en deux temps** : la barre basse « Voir le panier » ouvre le
   panier, où l'on ajuste les quantités et donne son **prénom** (obligatoire),
-  puis « Commander sur WhatsApp » ouvre le message déjà rempli
-  (`src/lib/order.ts`). Pas d'envoi accidentel. Panier et prénom survivent à
+  puis « Commander sur WhatsApp » ouvre le message déjà rempli, sans les
+  prix : le restaurant confirme le montant (`src/lib/order.ts`). Pas d'envoi accidentel. Panier et prénom survivent à
   un rechargement.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
-  et non celui du visiteur (`src/lib/hours.ts`).
+  et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »,
+  « Fermé », et l'heure seulement si elle est à moins d'une heure (« Ouvre à
+  17h30 », « Ouvert · ferme à 22h »).
+- **Plan Google Maps** chargé au toucher (« Afficher le plan ») : l'intégration
+  dépose des cookies Google, ce qui demande le consentement du visiteur en
+  France, et pèse près d'1 Mo. Le bouton « Itinéraire » ouvre la fiche Google
+  Maps de l'établissement.
 - **SEO local** : métadonnées, mots-clés « pizza Gros-Morne », et balisage
   schema.org `Restaurant` + `Menu` avec les prix (`src/components/JsonLd.tsx`).
 - **Mobile-first strict**, dark-only (c'est l'identité de la marque), zoom non

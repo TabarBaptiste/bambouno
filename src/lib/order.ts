@@ -1,4 +1,4 @@
-import { formatPrice, menuIndex } from "@/data/menu";
+import { menuIndex } from "@/data/menu";
 import { site } from "@/data/site";
 
 export type CartLine = { id: string; quantity: number };
@@ -38,13 +38,14 @@ export function cleanName(name: string): string {
 /**
  * Message pré-rempli pour WhatsApp. Le prénom permet au restaurant
  * d'appeler le client au retrait ; l'heure se règle dans la conversation.
+ * Pas de prix : c'est le restaurant qui confirme le montant.
  */
 export function buildOrderMessage(lines: CartLine[], name = ""): string {
   const rows = lines
     .map((line) => {
       const item = menuIndex[line.id];
       if (!item) return null;
-      return `• ${line.quantity} × ${item.name} - ${formatPrice(item.price * line.quantity)}`;
+      return `• ${line.quantity} × ${item.name}`;
     })
     .filter(Boolean);
 
@@ -62,8 +63,6 @@ export function buildOrderMessage(lines: CartLine[], name = ""): string {
     "",
     "Je voudrais commander :",
     ...rows,
-    "",
-    `Total : ${formatPrice(cartTotal(lines))}`,
     "",
     "À quelle heure puis-je venir récupérer ?",
   ].join("\n");

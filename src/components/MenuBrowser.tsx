@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { menu } from "@/data/menu";
 import { MenuItemCard } from "@/components/MenuItemCard";
+import { SectionTitle } from "@/components/SectionTitle";
 import { filterMenu } from "@/lib/search";
 
 const CATEGORY_IDS = new Set(menu.map((category) => category.id));
@@ -101,21 +102,21 @@ export function MenuBrowser() {
               tabIndex={-1}
               className="outline-none"
             >
-              <header className="flex items-baseline justify-between gap-4 border-b border-hairline pb-3">
-                <h3
+              <div className="flex items-end justify-between gap-4">
+                <SectionTitle
                   id={`${category.id}-titre`}
-                  className="section-title text-3xl sm:text-4xl"
-                >
-                  {category.title}
-                </h3>
-                <p className="shrink-0 text-sm text-muted">
+                  level={3}
+                  prefix={category.titlePrefix}
+                  accent={category.titleAccent}
+                />
+                <p className="shrink-0 pb-1 text-sm text-muted">
                   {category.items.length} {category.unit}
                 </p>
-              </header>
+              </div>
               {category.subtitle ? (
                 <p className="mt-3 text-sm text-muted">{category.subtitle}</p>
               ) : null}
-              <ul className="divide-y divide-hairline">
+              <ul className="mt-2 divide-y divide-hairline">
                 {category.items.map((item) => (
                   <MenuItemCard key={item.id} item={item} visual={category.visual} />
                 ))}

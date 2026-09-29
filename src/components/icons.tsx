@@ -68,3 +68,25 @@ export function ChiliIcon({ label, className }: TagIconProps) {
     </svg>
   );
 }
+
+/** Burger qui devient une croix à l'ouverture. */
+export function MenuIcon({ open, className }: IconProps & { open: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden className={className}>
+      {open ? (
+        <path d="M6 6l12 12M18 6 6 18" />
+      ) : (
+        <path d="M4 7h16M4 12h16M4 17h16" />
+      )}
+    </svg>
+  );
+}
+
+export function PizzaIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden className={className}>
+      <path d="M3.5 5.5Q12 1 20.5 5.5L19.3 7.7Q12 4 4.7 7.7Z" />
+      <path d="M5.6 9.3Q12 6.3 18.4 9.3L12 22Z" />
+    </svg>
+  );
+}

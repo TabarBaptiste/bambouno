@@ -41,6 +41,12 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
     await expectNoAxeViolations(page, "dialog");
   });
 
+  test("menu burger ouvert", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Menu" }).click();
+    await expectNoAxeViolations(page, "header");
+  });
+
   test("avec une recherche active", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("searchbox").fill("banane");
