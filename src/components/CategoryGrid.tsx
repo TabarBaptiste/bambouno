@@ -1,4 +1,4 @@
-import { menu } from "@/data/menu";
+import { countLabel, menu } from "@/data/menu";
 import { DishIllustration } from "@/components/DishIllustration";
 
 /**
@@ -21,7 +21,7 @@ export function CategoryGrid() {
                   {category.titlePrefix} {category.titleAccent}
                 </span>
                 <span className="block text-xs text-muted">
-                  {category.items.length} {category.unit}
+                  {countLabel(category.items.length, category.unit)}
                 </span>
               </span>
             </a>

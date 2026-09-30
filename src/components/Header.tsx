@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { site } from "@/data/site";
 import {
   ClockIcon,
@@ -10,7 +11,7 @@ import {
   PizzaIcon,
   SearchIcon,
 } from "@/components/icons";
-import { SearchDialog } from "@/components/SearchDialog";
+import { useSearch } from "@/components/SearchProvider";
 
 const LINKS = [
   { href: "#carte", label: "La carte", Icon: PizzaIcon },
@@ -21,11 +22,29 @@ const LINKS = [
 const ICON_BUTTON =
   "relative flex size-11 shrink-0 items-center justify-center rounded-full border border-control text-white transition-colors hover:border-red";
 
+/** Hauteur cumulée du header et de la barre de rubriques collée. */
+const STICKY_OFFSET = 64 + 57;
+
+/**
+ * Place le haut de la carte juste sous les barres collées, une seule fois, à
+ * l'ouverture de la recherche. Ensuite plus aucun défilement programmé : les
+ * résultats s'affichent à cet endroit pendant la frappe, sans rien bouger.
+ */
+function alignMenuList() {
+  const list = document.getElementById("menu-liste");
+  if (!list) return;
+  const top = list.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET;
+  window.scrollTo({ top, behavior: "instant" });
+}
+
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { query, setQuery } = useSearch();
   const header = useRef<HTMLElement>(null);
   const menuToggle = useRef<HTMLButtonElement>(null);
+  const searchToggle = useRef<HTMLButtonElement>(null);
+  const searchInput = useRef<HTMLInputElement>(null);
 
   // Échap ou clic en dehors referment le menu ; Échap rend le focus au bouton.
   useEffect(() => {
@@ -46,12 +65,80 @@ export function Header() {
     };
   }, [menuOpen]);
 
+  const openSearch = () => {
+    // Rendu synchrone puis focus dans le même geste : sur iPhone, c'est la
+    // seule façon d'ouvrir le clavier.
+    flushSync(() => {
+      setMenuOpen(false);
+      setSearchOpen(true);
+    });
+    alignMenuList();
+    searchInput.current?.focus({ preventScroll: true });
+  };
+
+  // Fermer la recherche la vide : pas de filtre caché qui traîne ensuite.
+  const closeSearch = () => {
+    flushSync(() => {
+      setSearchOpen(false);
+      setQuery("");
+    });
+    searchToggle.current?.focus();
+  };
+
   return (
     <header
       ref={header}
-      className="sticky top-0 z-30 border-b border-hairline bg-ink short:static"
+      // Écran très bas : le header défile avec la page (WCAG 1.4.10), sauf
+      // pendant une recherche, où le clavier seul réduit la hauteur visible et
+      // où le champ doit rester à l'écran.
+      className={`sticky top-0 z-30 border-b border-hairline bg-ink ${searchOpen ? "" : "short:static"}`}
     >
-      <div className="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4">
+      {/*
+        La recherche prend la place de la ligne du header, à hauteur égale :
+        rien ne se décale, et le champ reste en haut de l'écran avec le clavier.
+      */}
+      <form
+        role="search"
+        hidden={!searchOpen}
+        onSubmit={(event) => {
+          event.preventDefault();
+          // « Rechercher » sur le clavier : on le range pour voir les résultats.
+          searchInput.current?.blur();
+        }}
+        className="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4"
+      >
+        <label className="flex-1">
+          <span className="sr-only">Rechercher un plat ou un ingrédient</span>
+          <input
+            ref={searchInput}
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") closeSearch();
+            }}
+            placeholder="Crevettes, chèvre, nutella…"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="none"
+            spellCheck={false}
+            className="w-full rounded-full border border-control bg-surface px-4 py-2.5 text-base text-white placeholder:text-muted sm:text-sm"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={closeSearch}
+          className="min-h-11 shrink-0 rounded-full px-2 font-heading text-base font-semibold uppercase tracking-wide text-white hover:text-red-text"
+        >
+          Fermer<span className="sr-only"> la recherche</span>
+        </button>
+      </form>
+
+      <div
+        hidden={searchOpen}
+        className="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4"
+      >
         <a href="#top" className="mr-auto shrink-0" aria-label={`${site.name}, retour en haut de page`}>
           <span className="section-title text-xl sm:text-2xl">
             <span className="text-white">Bambou</span>
@@ -67,9 +154,9 @@ export function Header() {
         </a>
 
         <button
+          ref={searchToggle}
           type="button"
-          onClick={() => setSearchOpen(true)}
-          aria-haspopup="dialog"
+          onClick={openSearch}
           aria-label="Rechercher"
           className={ICON_BUTTON}
         >
@@ -111,8 +198,6 @@ export function Header() {
           ))}
         </ul>
       </nav>
-
-      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

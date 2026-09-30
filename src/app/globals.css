@@ -40,12 +40,6 @@
 
 html {
   scroll-behavior: smooth;
-  /*
-   * Le header et la barre de filtres collants ne doivent masquer ni les
-   * ancres de section, ni l'élément qui reçoit le focus (WCAG 2.4.11) :
-   * header (4rem) + barre de rubriques (~3.5rem) + un peu d'air.
-   */
-  scroll-padding-top: 8rem;
   background-color: var(--color-ink);
   color-scheme: dark;
 }
@@ -154,14 +148,26 @@ input:focus-visible {
   box-shadow: 0 0 0 3px rgba(255, 90, 79, 0.3);
 }
 
-/* Une fenêtre modale ouverte fige la page derrière (recherche, panier). */
+/* Le panier ouvert (fenêtre modale) fige la page derrière. */
 html:has(dialog[open]) {
   overflow: hidden;
 }
 
+/*
+ * Le header et la barre de rubriques collés ne doivent masquer ni les ancres
+ * de section, ni l'élément qui reçoit le focus (WCAG 2.4.11) : header (4rem)
+ * + barre (~3.5rem) + un peu d'air. La marge est posée sur le contenu et non
+ * en scroll-padding sur la page : sinon le champ de recherche du header, qui
+ * est toujours « sous » cette marge, faisait remonter la page à chaque
+ * lettre tapée (le navigateur tentait en vain de le dégager).
+ */
+main :is(a, button, input, [id]) {
+  scroll-margin-top: 8rem;
+}
+
 /* Même règle en bas d'écran, pour la barre de commande fixe. */
-html:has(#order-bar) {
-  scroll-padding-bottom: 7rem;
+html:has(#order-bar) main :is(a, button, input, [id]) {
+  scroll-margin-bottom: 7rem;
 }
 
 /*
@@ -169,10 +175,10 @@ html:has(#order-bar) {
  * mangeraient tout l'écran. On les laisse défiler avec la page (WCAG 1.4.10).
  */
 @media (max-height: 30rem) {
-  html {
-    scroll-padding-top: 1rem;
+  main :is(a, button, input, [id]) {
+    scroll-margin-top: 1rem;
   }
-  html:has(#order-bar) {
-    scroll-padding-bottom: 5rem;
+  html:has(#order-bar) main :is(a, button, input, [id]) {
+    scroll-margin-bottom: 5rem;
   }
 }

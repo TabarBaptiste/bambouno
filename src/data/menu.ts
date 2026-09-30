@@ -566,6 +566,11 @@ export const categoryOf: Record<string, MenuCategory> = Object.fromEntries(
   menu.flatMap((category) => category.items.map((item) => [item.id, category])),
 );
 
+/** « 15 pizzas », « 1 pizza » : l'unité est au pluriel dans les données. */
+export function countLabel(count: number, unit: string): string {
+  return `${count} ${count > 1 ? unit : unit.replace(/s$/, "")}`;
+}
+
 /** Titre court pour les puces de navigation : « Calzones », « Pizzas tomate ». */
 export function shortTitle(category: MenuCategory): string {
   const accent = category.titleAccent;
