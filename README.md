@@ -74,12 +74,13 @@ des tests de parcours clavier.
 - **Menu burger** dans le header : la carte, les horaires, l'adresse.
 - **Recherche dans le header** (loupe à côté du burger) : le champ prend la
   place de la ligne du header et filtre la carte directement, insensible aux
-  accents. « Fermer » vide la recherche. À l'ouverture, la carte est placée
-  une fois sous les barres collées ; ensuite plus rien ne défile pendant la
-  frappe. Pièges évités (constatés sur iPhone) : pas de `scroll-padding-top`
-  sur la page (le navigateur remontait la page à chaque lettre pour
-  « dégager » le champ du header), et le header reste collé pendant la
-  recherche même quand le clavier réduit la hauteur visible.
+  accents. Ouvrir la recherche remonte en haut de page et masque tout sauf la
+  carte (`html[data-recherche]`) : le header est à sa place naturelle, rien à
+  faire défiler quand le clavier s'ouvre sur iPhone. « Fermer » vide la
+  recherche et rend la page à l'endroit où on lisait ; valider ou ranger le
+  clavier avec un champ vide referme aussi. Pas de `scroll-padding-top` sur la
+  page (le navigateur remontait la page à chaque lettre pour « dégager » le
+  champ du header) : la marge est un `scroll-margin` sur le contenu.
 - **Barre de rubriques collée** sous le header pendant toute la carte : la
   puce de la rubrique à l'écran est mise en avant et se recentre toute seule,
   pour changer de rubrique sans remonter (`src/components/CategoryBar.tsx`).

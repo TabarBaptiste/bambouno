@@ -1,4 +1,4 @@
-import { categoryOf, menuIndex } from "@/data/menu";
+import { categoryOf, menu, menuIndex } from "@/data/menu";
 import { normalize } from "@/lib/search";
 import { site } from "@/data/site";
 
@@ -30,6 +30,21 @@ export function orderName(id: string): string {
   return `${label} ${item.name}`;
 }
 
+/** Rang de chaque plat dans la carte (rubrique, puis ordre dans la rubrique). */
+const menuRank: Record<string, number> = Object.fromEntries(
+  menu.flatMap((category) => category.items).map((item, index) => [item.id, index]),
+);
+
+/**
+ * Lignes rangées dans l'ordre de la carte : pizzas ensemble, puis friands…,
+ * quel que soit l'ordre des ajouts. Plus simple à lire pour le restaurant.
+ */
+export function sortByMenu(lines: CartLine[]): CartLine[] {
+  return [...lines].sort(
+    (a, b) => (menuRank[a.id] ?? Infinity) - (menuRank[b.id] ?? Infinity),
+  );
+}
+
 export function cartTotal(lines: CartLine[]): number {
   return lines.reduce((sum, line) => {
     const item = menuIndex[line.id];
@@ -53,10 +68,10 @@ export function cleanName(name: string): string {
  * Message pré-rempli pour WhatsApp. Le prénom permet au restaurant
  * d'appeler le client au retrait ; l'heure se règle dans la conversation.
  * Pas de prix : c'est le restaurant qui confirme le montant. Liste à plat,
- * dans l'ordre du panier, chaque plat précédé de son type pour se lire seul.
+ * dans l'ordre de la carte, chaque plat précédé de son type pour se lire seul.
  */
 export function buildOrderMessage(lines: CartLine[], name = ""): string {
-  const rows = lines
+  const rows = sortByMenu(lines)
     .map((line) => {
       if (!menuIndex[line.id]) return null;
       return `• ${line.quantity} × ${orderName(line.id)}`;

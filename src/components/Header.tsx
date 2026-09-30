@@ -22,19 +22,15 @@ const LINKS = [
 const ICON_BUTTON =
   "relative flex size-11 shrink-0 items-center justify-center rounded-full border border-control text-white transition-colors hover:border-red";
 
-/** Hauteur cumulée du header et de la barre de rubriques collée. */
-const STICKY_OFFSET = 64 + 57;
-
 /**
- * Place le haut de la carte juste sous les barres collées, une seule fois, à
- * l'ouverture de la recherche. Ensuite plus aucun défilement programmé : les
- * résultats s'affichent à cet endroit pendant la frappe, sans rien bouger.
+ * Mode recherche : la page ne montre plus que la carte (hero, rubriques,
+ * infos et pied de page masqués en CSS, cf. globals.css) et remonte en haut.
+ * Le header est alors à sa place naturelle : sur iPhone, rien à faire
+ * défiler quand le clavier s'ouvre, donc la barre ne disparaît plus.
  */
-function alignMenuList() {
-  const list = document.getElementById("menu-liste");
-  if (!list) return;
-  const top = list.getBoundingClientRect().top + window.scrollY - STICKY_OFFSET;
-  window.scrollTo({ top, behavior: "instant" });
+function setSearchMode(on: boolean) {
+  if (on) document.documentElement.dataset.recherche = "";
+  else delete document.documentElement.dataset.recherche;
 }
 
 export function Header() {
@@ -45,6 +41,8 @@ export function Header() {
   const menuToggle = useRef<HTMLButtonElement>(null);
   const searchToggle = useRef<HTMLButtonElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
+  // Position de lecture avant la recherche, rendue à la fermeture.
+  const scrollBeforeSearch = useRef<number | null>(null);
 
   // Échap ou clic en dehors referment le menu ; Échap rend le focus au bouton.
   useEffect(() => {
@@ -66,23 +64,42 @@ export function Header() {
   }, [menuOpen]);
 
   const openSearch = () => {
+    scrollBeforeSearch.current = window.scrollY;
     // Rendu synchrone puis focus dans le même geste : sur iPhone, c'est la
     // seule façon d'ouvrir le clavier.
     flushSync(() => {
       setMenuOpen(false);
       setSearchOpen(true);
     });
-    alignMenuList();
+    setSearchMode(true);
+    window.scrollTo({ top: 0, behavior: "instant" });
     searchInput.current?.focus({ preventScroll: true });
   };
 
-  // Fermer la recherche la vide : pas de filtre caché qui traîne ensuite.
-  const closeSearch = () => {
+  // Fermer la recherche la vide et rend la page telle qu'on l'avait laissée.
+  const closeSearch = (restoreFocus = true) => {
+    const previous = scrollBeforeSearch.current;
+    if (previous === null) return; // déjà fermée
+    scrollBeforeSearch.current = null;
     flushSync(() => {
       setSearchOpen(false);
       setQuery("");
     });
-    searchToggle.current?.focus();
+    setSearchMode(false);
+    window.scrollTo({ top: previous, behavior: "instant" });
+    if (restoreFocus) searchToggle.current?.focus({ preventScroll: true });
+  };
+
+  // Champ vide rangé (loupe ou « OK » du clavier, toucher ailleurs) : la
+  // recherche n'a plus lieu d'être. Léger délai pour laisser aboutir un
+  // toucher en cours (sur un plat par exemple) avant que la page change.
+  const closeIfEmpty = () => {
+    window.setTimeout(() => {
+      const input = searchInput.current;
+      if (input && document.activeElement !== input && !input.value.trim()) {
+        closeSearch(false);
+      }
+    }, 250);
   };
 
   return (
@@ -102,8 +119,10 @@ export function Header() {
         hidden={!searchOpen}
         onSubmit={(event) => {
           event.preventDefault();
-          // « Rechercher » sur le clavier : on le range pour voir les résultats.
-          searchInput.current?.blur();
+          // Touche « Rechercher » : on range le clavier pour voir les
+          // résultats, ou on referme tout si le champ est vide.
+          if (query.trim()) searchInput.current?.blur();
+          else closeSearch();
         }}
         className="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4"
       >
@@ -114,21 +133,19 @@ export function Header() {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onBlur={closeIfEmpty}
             onKeyDown={(event) => {
               if (event.key === "Escape") closeSearch();
             }}
             placeholder="Crevettes, chèvre, nutella…"
             enterKeyHint="search"
             autoComplete="off"
-            autoCorrect="off"
-            autoCapitalize="none"
-            spellCheck={false}
             className="w-full rounded-full border border-control bg-surface px-4 py-2.5 text-base text-white placeholder:text-muted sm:text-sm"
           />
         </label>
         <button
           type="button"
-          onClick={closeSearch}
+          onClick={() => closeSearch()}
           className="min-h-11 shrink-0 rounded-full px-2 font-heading text-base font-semibold uppercase tracking-wide text-white hover:text-red-text"
         >
           Fermer<span className="sr-only"> la recherche</span>
