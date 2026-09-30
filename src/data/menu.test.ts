@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { formatPrice, menu, menuIndex } from "@/data/menu";
+import { countLabel, formatPrice, menu, menuIndex } from "@/data/menu";
+
+describe("countLabel", () => {
+  it("accorde l'unité au nombre", () => {
+    expect(countLabel(15, "pizzas")).toBe("15 pizzas");
+    expect(countLabel(1, "pizzas")).toBe("1 pizza");
+    expect(countLabel(1, "crêpes")).toBe("1 crêpe");
+  });
+});
 
 // Garde-fous sur les données : la carte est éditée à la main, une faute de
 // frappe (id en double, prix oublié) casserait le panier sans bruit.
