@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { formatPrice, menuIndex } from "@/data/menu";
 import { useOrder } from "@/components/OrderProvider";
 import { NewTabHint } from "@/components/NewTabHint";
-import { cleanName, MAX_NAME_LENGTH, whatsappUrl } from "@/lib/order";
+import { cleanName, MAX_NAME_LENGTH, orderName, whatsappUrl } from "@/lib/order";
 import { WhatsAppIcon } from "@/components/icons";
 
 /** Quand plus rien ne peut garder le focus (panier vidé), il revient à la carte. */
@@ -166,7 +166,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
                 <li key={line.id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
                     <p className="font-heading text-base font-semibold uppercase leading-tight">
-                      {item.name}
+                      {orderName(line.id)}
                     </p>
                     <p className="text-sm text-muted">
                       {formatPrice(item.price * line.quantity)}
@@ -175,7 +175,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
                   <button
                     type="button"
                     onClick={() => removeOne(line.id, line.quantity)}
-                    aria-label={`Retirer ${item.name}`}
+                    aria-label={`Retirer ${orderName(line.id)}`}
                     className="flex size-11 items-center justify-center rounded-full border border-control text-xl leading-none hover:border-red hover:text-red-text"
                   >
                     <span aria-hidden>−</span>
@@ -187,7 +187,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
                   <button
                     type="button"
                     onClick={() => add(line.id)}
-                    aria-label={`Ajouter ${item.name}`}
+                    aria-label={`Ajouter ${orderName(line.id)}`}
                     className="flex size-11 items-center justify-center rounded-full bg-red-cta text-xl leading-none text-white hover:bg-red-dark"
                   >
                     <span aria-hidden>+</span>
