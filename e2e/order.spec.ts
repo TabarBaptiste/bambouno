@@ -118,7 +118,7 @@ test("le message WhatsApp dit ce qu'est chaque plat, à plat, sans prix", async 
   await cart.getByRole("button", { name: /Commander sur WhatsApp/ }).click();
   const text = new URL((await popupPromise).url()).searchParams.get("text");
   expect(text).toContain(
-    "• 1 × Pizza Exotique\n• 1 × Pizza sucrée À la banane\n• 1 × Pizza pêcheur Crevettes à la crème",
+    "• 1 × Pizza Exotique\n• 1 × Pizza pêcheur Crevettes à la crème\n• 1 × Pizza sucrée À la banane",
   );
   expect(text).not.toMatch(/€|total/i);
 });
@@ -140,25 +140,70 @@ test("la recherche est dans le header et ignore les accents", async ({ page }) =
   await expect(page.getByRole("status").filter({ hasText: /correspond/ })).toBeAttached();
 });
 
-test("la barre de recherche filtre la carte directement, sans faire bouger la page", async ({ page }) => {
+test("la recherche remonte en haut, ne montre que la carte et ne bouge plus", async ({ page }) => {
   await page.goto("/");
+  await page.evaluate(() => document.getElementById("friands")?.scrollIntoView({ behavior: "instant" }));
+  const reading = await page.evaluate(() => Math.round(window.scrollY));
+
   await page.getByRole("button", { name: "Rechercher" }).click();
   const input = page.getByRole("searchbox");
   await expect(input).toBeFocused();
+  // Header à sa place naturelle, en haut de page : rien à faire défiler au clavier.
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.getByRole("heading", { level: 1 })).toBeHidden();
+  await expect(page.getByRole("navigation", { name: "Rubriques de la carte" })).toBeHidden();
 
-  // La carte est placée sous le header à l'ouverture, puis plus rien ne défile.
-  const scrollAtOpen = await page.evaluate(() => window.scrollY);
   await input.pressSequentially("banane", { delay: 30 });
-  expect(await page.evaluate(() => window.scrollY)).toBe(scrollAtOpen);
-
-  await expect(input).toBeInViewport();
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await expect(page.getByRole("heading", { name: /À la banane/ })).toBeInViewport();
   await expect(page.locator("#boissons")).toHaveCount(0);
 
   // On ajoute depuis les résultats : la barre du panier apparaît.
   await page.getByRole("button", { name: "Ajouter À la banane" }).click();
   await expect(page.getByRole("button", { name: /Voir le panier/ })).toBeVisible();
-  expect(await page.evaluate(() => window.scrollY)).toBe(scrollAtOpen);
+
+  // Fermer rend la page entière, à l'endroit où on lisait.
+  await page.getByRole("button", { name: "Fermer la recherche" }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toBeAttached();
+  // À quelques pixels près (positions sous-pixel).
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - reading)).toBeLessThan(10);
+});
+
+test("valider un champ vide referme la recherche", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Rechercher" }).click();
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("searchbox")).toBeHidden();
+  await expect(page.getByRole("button", { name: "Rechercher" })).toBeVisible();
+});
+
+test("ranger le clavier avec un champ vide referme la recherche", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Rechercher" }).click();
+  await page.getByRole("searchbox").blur();
+  await expect(page.getByRole("searchbox")).toBeHidden();
+});
+
+test("valider une recherche garde les résultats", async ({ page }) => {
+  await page.goto("/");
+  await search(page, "banane");
+  await page.keyboard.press("Enter");
+  await expect(page.getByRole("searchbox")).toBeVisible();
+  await expect(page.getByRole("searchbox")).not.toBeFocused();
+  await expect(page.getByRole("heading", { name: /À la banane/ })).toBeVisible();
+});
+
+test("le panier est rangé dans l'ordre de la carte", async ({ page }) => {
+  await page.goto("/");
+  for (const name of ["Ajouter Coca-Cola 50 cl", "Ajouter La Gros-Mornaise", "Ajouter 4 Fromages"]) {
+    await page.getByRole("button", { name }).click();
+  }
+  await page.getByRole("button", { name: /Voir le panier/ }).click();
+  const names = await page
+    .getByRole("dialog", { name: "Votre panier" })
+    .locator("li p:first-child")
+    .allTextContents();
+  expect(names).toEqual(["Pizza 4 Fromages", "Friand La Gros-Mornaise", "Coca-Cola 50 cl"]);
 });
 
 test("le champ de recherche n'a pas d'anneau jaune", async ({ page }) => {
@@ -167,32 +212,6 @@ test("le champ de recherche n'a pas d'anneau jaune", async ({ page }) => {
   const input = page.getByRole("searchbox");
   await expect(input).toHaveCSS("outline-style", "none");
   await expect(input).toHaveCSS("border-top-color", "rgb(255, 90, 79)");
-});
-
-test("Fermer vide la recherche et rend toute la carte", async ({ page }) => {
-  await page.goto("/");
-  await search(page, "banane");
-  await expect(page.locator("#boissons")).toHaveCount(0);
-  await page.getByRole("button", { name: "Fermer la recherche" }).click();
-  await expect(page.getByRole("searchbox")).toBeHidden();
-  await expect(page.locator("#boissons")).toBeAttached();
-  await expect(page.getByRole("button", { name: "Rechercher" })).toBeFocused();
-});
-
-test("une rubrique masquée par la recherche réapparaît au clic", async ({ page }) => {
-  await page.goto("/");
-  await search(page, "banane");
-  await expect(page.locator("#boissons")).toHaveCount(0);
-  // Les rubriques du haut de page restent accessibles pendant la recherche.
-  await page.evaluate(() => window.scrollTo(0, 0));
-
-  await page
-    .getByRole("navigation", { name: "Rubriques de la carte" })
-    .getByRole("link", { name: /boissons/i })
-    .click();
-
-  await expect(page.locator("#boissons")).toBeInViewport();
-  await expect(page.getByRole("searchbox")).toHaveValue("");
 });
 
 test("la barre de rubriques suit le défilement et recentre la puce active", async ({ page }) => {

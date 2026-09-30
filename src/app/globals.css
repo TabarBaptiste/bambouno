@@ -148,6 +148,11 @@ input:focus-visible {
   box-shadow: 0 0 0 3px rgba(255, 90, 79, 0.3);
 }
 
+/* Mode recherche (cf. Header) : seule la carte reste affichée. */
+html[data-recherche] [data-hors-recherche] {
+  display: none;
+}
+
 /* Le panier ouvert (fenêtre modale) fige la page derrière. */
 html:has(dialog[open]) {
   overflow: hidden;

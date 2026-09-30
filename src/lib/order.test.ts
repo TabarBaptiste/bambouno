@@ -47,14 +47,15 @@ describe("orderName", () => {
 });
 
 describe("message WhatsApp", () => {
-  it("liste à plat, dans l'ordre du panier, avec le type de chaque plat", () => {
+  it("range les plats dans l'ordre de la carte, pas dans l'ordre des ajouts", () => {
     const message = buildOrderMessage([
-      { id: "p-exotique", quantity: 1 },
-      { id: "ps-banane", quantity: 2 },
       { id: "b-coca", quantity: 1 },
+      { id: "p-4-fromages", quantity: 1 },
+      { id: "f-gros-mornaise", quantity: 1 },
+      { id: "p-exotique", quantity: 1 },
     ]);
     expect(message).toContain(
-      "• 1 × Pizza Exotique\n• 2 × Pizza sucrée À la banane\n• 1 × Coca-Cola 50 cl",
+      "• 1 × Pizza 4 Fromages\n• 1 × Pizza Exotique\n• 1 × Friand La Gros-Mornaise\n• 1 × Coca-Cola 50 cl",
     );
   });
 
