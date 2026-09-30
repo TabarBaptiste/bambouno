@@ -87,10 +87,11 @@ des tests de parcours clavier.
 - **Commande en deux temps** : la barre basse « Voir le panier » ouvre le
   panier, où l'on ajuste les quantités et donne son **prénom** (obligatoire),
   puis « Commander sur WhatsApp » ouvre le message déjà rempli, sans les
-  prix : le restaurant confirme le montant (`src/lib/order.ts`). Liste à plat,
-  chaque plat précédé de son type (« Pizza sucrée À la banane », « Crêpe
-  sucrée Nutella ») : `orderLabel` de chaque rubrique dans `src/data/menu.ts`. Pas d'envoi accidentel. Panier et prénom survivent à
-  un rechargement.
+  prix : le restaurant confirme le montant (`src/lib/order.ts`). Liste à plat
+  dans l'ordre de la carte (quel que soit l'ordre des ajouts), chaque plat
+  précédé de son type (« Pizza sucrée À la banane », « Crêpe sucrée
+  Nutella ») : `orderLabel` de chaque rubrique dans `src/data/menu.ts`. Pas
+  d'envoi accidentel. Panier et prénom survivent à un rechargement.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
   et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »
   (plus « ferme à 22h » dans la dernière heure) ou « Fermé • Ouvre à 17h30 »,
