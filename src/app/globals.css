@@ -144,6 +144,21 @@ body {
   outline: none;
 }
 
+/*
+ * Champs de saisie : un cadre rouge au lieu de l'anneau jaune, qui doublait
+ * la bordure. Le contraste reste largement au-dessus de 3:1 (WCAG 1.4.11).
+ */
+input:focus-visible {
+  outline: none;
+  border-color: var(--color-red-text);
+  box-shadow: 0 0 0 3px rgba(255, 90, 79, 0.3);
+}
+
+/* Une fenêtre modale ouverte fige la page derrière (recherche, panier). */
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 /* Même règle en bas d'écran, pour la barre de commande fixe. */
 html:has(#order-bar) {
   scroll-padding-bottom: 7rem;

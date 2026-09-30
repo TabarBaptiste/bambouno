@@ -123,63 +123,68 @@ test("le message WhatsApp dit ce qu'est chaque plat, à plat, sans prix", async 
   expect(text).not.toMatch(/€|total/i);
 });
 
-async function search(page: import("@playwright/test").Page, text: string) {
+async function openSearch(page: import("@playwright/test").Page) {
   await page.getByRole("button", { name: "Rechercher" }).click();
-  await page.getByRole("searchbox").fill(text);
+  const dialog = page.getByRole("dialog", { name: "Rechercher dans la carte" });
+  await expect(dialog).toBeVisible();
+  return dialog;
 }
 
-test("la recherche est dans le header et ignore les accents", async ({ page }) => {
+test("la recherche s'ouvre en fenêtre depuis le header et ignore les accents", async ({ page }) => {
   await page.goto("/");
-  // Plus de champ de recherche dans la page : il faut ouvrir celui du header.
-  await expect(page.getByRole("searchbox")).toBeHidden();
-  await page.getByRole("button", { name: "Rechercher" }).click();
-  await expect(page.getByRole("searchbox")).toBeFocused();
+  // Plus de champ de recherche dans la page.
+  await expect(page.getByRole("searchbox")).toHaveCount(0);
 
-  await page.getByRole("searchbox").fill("chevre");
-  await expect(page.getByRole("heading", { name: "4 Fromages" })).toBeVisible();
-  await expect(page.getByRole("status").filter({ hasText: /correspond/ })).toBeAttached();
+  const dialog = await openSearch(page);
+  await expect(dialog.getByRole("searchbox")).toBeFocused();
+
+  await dialog.getByRole("searchbox").fill("chevre");
+  await expect(dialog.getByRole("heading", { name: "4 Fromages" })).toBeVisible();
+  await expect(dialog.getByRole("status")).toHaveText(/correspond/);
 });
 
-test("Entrée referme le champ, garde le filtre et amène aux résultats", async ({ page }) => {
+test("on ajoute un plat depuis les résultats, sans que la page bouge", async ({ page }) => {
   await page.goto("/");
-  await search(page, "banane");
-  await page.keyboard.press("Enter");
+  const scrollBefore = await page.evaluate(() => window.scrollY);
 
-  await expect(page.getByRole("searchbox")).toBeHidden();
-  await expect(page.locator("#menu-liste")).toBeInViewport();
-  await expect(page.getByRole("heading", { name: "À la banane" })).toBeInViewport();
-  // Le filtre est signalé même champ fermé : pastille sur la loupe et puce dans la barre.
-  await expect(page.getByRole("button", { name: /recherche en cours : banane/ })).toBeVisible();
-  const clear = page.getByRole("button", { name: "Effacer la recherche : banane" });
-  await expect(clear).toBeVisible();
+  const dialog = await openSearch(page);
+  await dialog.getByRole("searchbox").fill("banane");
+  await dialog.getByRole("button", { name: "Ajouter À la banane" }).click();
+  await dialog.getByRole("button", { name: "Ajouter À la banane" }).click();
+  await expect(dialog.getByText("Quantité : 2")).toBeAttached();
 
-  await clear.click();
-  await expect(clear).toBeHidden();
-  await expect(page.locator("#boissons")).toBeAttached();
+  // Rien n'a fait défiler la page derrière.
+  expect(await page.evaluate(() => window.scrollY)).toBe(scrollBefore);
+
+  await dialog.getByRole("button", { name: "Fermer la recherche" }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByRole("button", { name: /Voir le panier/ })).toContainText("2 articles");
 });
 
-test("Échap referme le champ de recherche et rend le focus à la loupe", async ({ page }) => {
+test("Échap referme la recherche et rend le focus à la loupe", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "Rechercher" }).click();
+  await openSearch(page);
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("searchbox")).toBeHidden();
+  await expect(page.getByRole("dialog")).toBeHidden();
   await expect(page.getByRole("button", { name: "Rechercher" })).toBeFocused();
 });
 
-test("une rubrique masquée par la recherche réapparaît au clic", async ({ page }) => {
+test("aucun résultat propose d'effacer la recherche", async ({ page }) => {
   await page.goto("/");
-  await search(page, "banane");
-  await page.keyboard.press("Enter");
-  await expect(page.locator("#boissons")).toHaveCount(0);
+  const dialog = await openSearch(page);
+  await dialog.getByRole("searchbox").fill("zzzz");
+  await expect(dialog.getByText("Rien ne correspond")).toBeVisible();
+  await dialog.getByRole("button", { name: "Effacer la recherche" }).click();
+  await expect(dialog.getByRole("searchbox")).toHaveValue("");
+});
 
-  await page
-    .getByRole("navigation", { name: "Rubriques de la carte" })
-    .getByRole("link", { name: /boissons/i })
-    .click();
-
-  await expect(page.locator("#boissons")).toBeInViewport();
-  await page.getByRole("button", { name: /Rechercher/ }).click();
-  await expect(page.getByRole("searchbox")).toHaveValue("");
+test("le champ de recherche n'a pas d'anneau jaune", async ({ page }) => {
+  await page.goto("/");
+  const dialog = await openSearch(page);
+  const input = dialog.getByRole("searchbox");
+  await expect(input).toBeFocused();
+  await expect(input).toHaveCSS("outline-style", "none");
+  await expect(input).toHaveCSS("border-top-color", "rgb(255, 90, 79)");
 });
 
 test("la barre de rubriques suit le défilement et recentre la puce active", async ({ page }) => {

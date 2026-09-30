@@ -72,10 +72,12 @@ des tests de parcours clavier.
   épicé) + prix + ingrédients, et sous le texte le bouton « + », fixe à
   droite pour pouvoir taper vite ; « − » et quantité apparaissent à sa gauche.
 - **Menu burger** dans le header : la carte, les horaires, l'adresse.
-- **Recherche dans le header** (loupe à côté du burger), insensible aux
-  accents. Entrée referme le champ et amène aux résultats ; le filtre reste
-  signalé par une pastille sur la loupe et une puce « × » dans la barre de
-  rubriques.
+- **Recherche dans le header** (loupe à côté du burger) : fenêtre plein écran
+  avec les résultats et les boutons d'ajout, insensible aux accents
+  (`src/components/SearchDialog.tsx`). Elle ne filtre volontairement pas la
+  page derrière : sur mobile, le clavier réduit la zone visible et le
+  navigateur fait défiler la page, ce qui sortait le champ de l'écran. La
+  fenêtre épouse la `visualViewport` et la page derrière est figée.
 - **Barre de rubriques collée** sous le header pendant toute la carte : la
   puce de la rubrique à l'écran est mise en avant et se recentre toute seule,
   pour changer de rubrique sans remonter (`src/components/CategoryBar.tsx`).
