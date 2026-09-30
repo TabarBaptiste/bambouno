@@ -47,20 +47,13 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
     await expectNoAxeViolations(page, "header");
   });
 
-  test("champ de recherche ouvert dans le header", async ({ page }) => {
+  test("fenêtre de recherche avec résultats", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Rechercher" }).click();
-    await page.getByRole("searchbox").fill("banane");
-    await expectNoAxeViolations(page, "header");
-  });
-
-  test("avec une recherche active, champ refermé", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("button", { name: "Rechercher" }).click();
-    await page.getByRole("searchbox").fill("banane");
-    await page.keyboard.press("Enter");
-    await expect(page.getByRole("searchbox")).toBeHidden();
-    await expectNoAxeViolations(page);
+    const dialog = page.getByRole("dialog", { name: "Rechercher dans la carte" });
+    await dialog.getByRole("searchbox").fill("banane");
+    await expect(dialog.getByRole("heading", { name: /À la banane/ })).toBeVisible();
+    await expectNoAxeViolations(page, "dialog");
   });
 
   test("barre de rubriques collée en bas de carte", async ({ page }) => {

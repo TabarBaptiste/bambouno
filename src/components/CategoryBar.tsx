@@ -17,15 +17,7 @@ const CLICK_LOCK_MS = 900;
  * est mise en avant et se recentre toute seule : où qu'on soit dans la carte,
  * on saute à une autre rubrique sans remonter en haut de page.
  */
-export function CategoryBar({
-  categories,
-  query,
-  onClearQuery,
-}: {
-  categories: MenuCategory[];
-  query: string;
-  onClearQuery: () => void;
-}) {
+export function CategoryBar({ categories }: { categories: MenuCategory[] }) {
   const [active, setActive] = useState<string | null>(null);
   const list = useRef<HTMLUListElement>(null);
   const lockedUntil = useRef(0);
@@ -93,19 +85,6 @@ export function CategoryBar({
           ref={list}
           className="flex gap-2 overflow-x-auto px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {query.trim() ? (
-            <li className="shrink-0">
-              <button
-                type="button"
-                onClick={onClearQuery}
-                aria-label={`Effacer la recherche : ${query.trim()}`}
-                className={`${chip} max-w-[12rem] gap-2 border-mango text-mango hover:bg-mango/10`}
-              >
-                <span className="truncate normal-case">« {query.trim()} »</span>
-                <span aria-hidden>×</span>
-              </button>
-            </li>
-          ) : null}
           {categories.map((category) => (
             <li key={category.id} className="shrink-0">
               <a
