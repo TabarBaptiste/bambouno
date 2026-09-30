@@ -72,20 +72,26 @@ des tests de parcours clavier.
   épicé) + prix + ingrédients, et sous le texte le bouton « + », fixe à
   droite pour pouvoir taper vite ; « − » et quantité apparaissent à sa gauche.
 - **Menu burger** dans le header : la carte, les horaires, l'adresse.
-- **Recherche dans le header** (loupe à côté du burger), insensible aux
-  accents. Entrée referme le champ et amène aux résultats ; le filtre reste
-  signalé par une pastille sur la loupe et une puce « × » dans la barre de
-  rubriques.
+- **Recherche dans le header** (loupe à côté du burger) : le champ prend la
+  place de la ligne du header et filtre la carte directement, insensible aux
+  accents. Ouvrir la recherche remonte en haut de page et masque tout sauf la
+  carte (`html[data-recherche]`) : le header est à sa place naturelle, rien à
+  faire défiler quand le clavier s'ouvre sur iPhone. « Fermer » vide la
+  recherche et rend la page à l'endroit où on lisait ; valider ou ranger le
+  clavier avec un champ vide referme aussi. Pas de `scroll-padding-top` sur la
+  page (le navigateur remontait la page à chaque lettre pour « dégager » le
+  champ du header) : la marge est un `scroll-margin` sur le contenu.
 - **Barre de rubriques collée** sous le header pendant toute la carte : la
   puce de la rubrique à l'écran est mise en avant et se recentre toute seule,
   pour changer de rubrique sans remonter (`src/components/CategoryBar.tsx`).
 - **Commande en deux temps** : la barre basse « Voir le panier » ouvre le
   panier, où l'on ajuste les quantités et donne son **prénom** (obligatoire),
   puis « Commander sur WhatsApp » ouvre le message déjà rempli, sans les
-  prix : le restaurant confirme le montant (`src/lib/order.ts`). Liste à plat,
-  chaque plat précédé de son type (« Pizza sucrée À la banane », « Crêpe
-  sucrée Nutella ») : `orderLabel` de chaque rubrique dans `src/data/menu.ts`. Pas d'envoi accidentel. Panier et prénom survivent à
-  un rechargement.
+  prix : le restaurant confirme le montant (`src/lib/order.ts`). Liste à plat
+  dans l'ordre de la carte (quel que soit l'ordre des ajouts), chaque plat
+  précédé de son type (« Pizza sucrée À la banane », « Crêpe sucrée
+  Nutella ») : `orderLabel` de chaque rubrique dans `src/data/menu.ts`. Pas
+  d'envoi accidentel. Panier et prénom survivent à un rechargement.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
   et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »
   (plus « ferme à 22h » dans la dernière heure) ou « Fermé • Ouvre à 17h30 »,
