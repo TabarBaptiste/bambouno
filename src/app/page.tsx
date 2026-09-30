@@ -23,14 +23,16 @@ export default function HomePage() {
         <Header />
         {/* tabIndex -1 : cible focalisable du lien d'évitement. */}
         <main id="contenu" tabIndex={-1} className="outline-none">
-          <Hero />
+          <div data-hors-recherche>
+            <Hero />
+          </div>
 
           <section id="carte" aria-labelledby="carte-titre" tabIndex={-1} className="outline-none">
             {/*
               MenuBrowser gère lui-même ses largeurs : sa barre de rubriques
               collante doit être pleine largeur, elle ne peut pas vivre ici.
             */}
-            <div className="mx-auto max-w-5xl px-4">
+            <div data-hors-recherche className="mx-auto max-w-5xl px-4">
               <div className="flex items-baseline justify-between gap-4">
                 <SectionTitle id="carte-titre" prefix="La" accent="carte" />
                 <p className="shrink-0 text-sm text-muted">{menu.length} rubriques</p>
@@ -40,9 +42,13 @@ export default function HomePage() {
             <MenuBrowser />
           </section>
 
-          <InfoSection />
+          <div data-hors-recherche>
+            <InfoSection />
+          </div>
         </main>
-        <Footer />
+        <div data-hors-recherche>
+          <Footer />
+        </div>
         <OrderBar />
       </SearchProvider>
     </OrderProvider>

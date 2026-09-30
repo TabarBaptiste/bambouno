@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { formatPrice, menuIndex } from "@/data/menu";
 import { useOrder } from "@/components/OrderProvider";
 import { NewTabHint } from "@/components/NewTabHint";
-import { cleanName, MAX_NAME_LENGTH, orderName, whatsappUrl } from "@/lib/order";
+import { cleanName, MAX_NAME_LENGTH, orderName, sortByMenu, whatsappUrl } from "@/lib/order";
 import { WhatsAppIcon } from "@/components/icons";
 
 /** Quand plus rien ne peut garder le focus (panier vidé), il revient à la carte. */
@@ -159,7 +159,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
       ) : (
         <>
           <ul className="mt-4 divide-y divide-hairline border-y border-hairline">
-            {lines.map((line) => {
+            {sortByMenu(lines).map((line) => {
               const item = menuIndex[line.id];
               if (!item) return null;
               return (

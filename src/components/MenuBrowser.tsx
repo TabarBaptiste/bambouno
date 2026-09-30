@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { menu } from "@/data/menu";
+import { countLabel, menu } from "@/data/menu";
 import { CategoryBar } from "@/components/CategoryBar";
 import { MenuItemCard } from "@/components/MenuItemCard";
 import { useSearch } from "@/components/SearchProvider";
@@ -45,10 +45,11 @@ export function MenuBrowser() {
     setPendingAnchor(null);
   }, [pendingAnchor]);
 
+  // Pendant une recherche, la carte garde au moins la hauteur de l'écran :
+  // sinon la page raccourcit à chaque lettre et le navigateur la fait sauter.
   return (
-    <div>
-      {/* Aucun résultat : la barre ne garde que la puce pour effacer la recherche. */}
-      <CategoryBar categories={filtered} query={query} onClearQuery={resetFilters} />
+    <div className={isFiltering ? "min-h-[100dvh]" : undefined}>
+      <CategoryBar categories={filtered} />
 
       {/* Nombre de résultats annoncé aux lecteurs d'écran pendant la saisie. */}
       <p role="status" className="sr-only">
@@ -88,7 +89,7 @@ export function MenuBrowser() {
                   accent={category.titleAccent}
                 />
                 <p className="shrink-0 pb-1 text-sm text-muted">
-                  {category.items.length} {category.unit}
+                  {countLabel(category.items.length, category.unit)}
                 </p>
               </div>
               {category.subtitle ? (

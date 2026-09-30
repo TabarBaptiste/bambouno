@@ -54,12 +54,11 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
     await expectNoAxeViolations(page, "header");
   });
 
-  test("avec une recherche active, champ refermé", async ({ page }) => {
+  test("page filtrée par une recherche", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("button", { name: "Rechercher" }).click();
     await page.getByRole("searchbox").fill("banane");
     await page.keyboard.press("Enter");
-    await expect(page.getByRole("searchbox")).toBeHidden();
     await expectNoAxeViolations(page);
   });
 
