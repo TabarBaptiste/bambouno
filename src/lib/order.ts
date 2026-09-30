@@ -1,4 +1,5 @@
-import { menuIndex } from "@/data/menu";
+import { categoryOf, menuIndex } from "@/data/menu";
+import { normalize } from "@/lib/search";
 import { site } from "@/data/site";
 
 export type CartLine = { id: string; quantity: number };
@@ -14,6 +15,19 @@ export function sanitize(value: unknown): CartLine[] {
     const clamped = Math.min(Math.max(Math.floor(quantity), 1), 99);
     return [{ id, quantity: clamped }];
   });
+}
+
+/**
+ * Nom complet d'un plat : « Pizza sucrée À la banane », « Crêpe salée
+ * Crevettes à la crème ». Le type n'est pas répété quand le nom le contient
+ * déjà (« Bière Lorraine 25 cl »).
+ */
+export function orderName(id: string): string {
+  const item = menuIndex[id];
+  if (!item) return "";
+  const label = categoryOf[id]?.orderLabel;
+  if (!label || normalize(item.name).startsWith(normalize(label))) return item.name;
+  return `${label} ${item.name}`;
 }
 
 export function cartTotal(lines: CartLine[]): number {
@@ -38,14 +52,14 @@ export function cleanName(name: string): string {
 /**
  * Message pré-rempli pour WhatsApp. Le prénom permet au restaurant
  * d'appeler le client au retrait ; l'heure se règle dans la conversation.
- * Pas de prix : c'est le restaurant qui confirme le montant.
+ * Pas de prix : c'est le restaurant qui confirme le montant. Liste à plat,
+ * dans l'ordre du panier, chaque plat précédé de son type pour se lire seul.
  */
 export function buildOrderMessage(lines: CartLine[], name = ""): string {
   const rows = lines
     .map((line) => {
-      const item = menuIndex[line.id];
-      if (!item) return null;
-      return `• ${line.quantity} × ${item.name}`;
+      if (!menuIndex[line.id]) return null;
+      return `• ${line.quantity} × ${orderName(line.id)}`;
     })
     .filter(Boolean);
 
