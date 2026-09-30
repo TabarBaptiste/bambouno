@@ -2,14 +2,16 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { menu } from "@/data/menu";
+import { CategoryBar } from "@/components/CategoryBar";
 import { MenuItemCard } from "@/components/MenuItemCard";
+import { useSearch } from "@/components/SearchProvider";
 import { SectionTitle } from "@/components/SectionTitle";
 import { filterMenu } from "@/lib/search";
 
 const CATEGORY_IDS = new Set(menu.map((category) => category.id));
 
 export function MenuBrowser() {
-  const [query, setQuery] = useState("");
+  const { query, setQuery } = useSearch();
   const [pendingAnchor, setPendingAnchor] = useState<string | null>(null);
 
   const resetFilters = () => setQuery("");
@@ -32,7 +34,7 @@ export function MenuBrowser() {
     };
     document.addEventListener("click", onClick);
     return () => document.removeEventListener("click", onClick);
-  }, []);
+  }, [setQuery]);
 
   useEffect(() => {
     if (!pendingAnchor) return;
@@ -45,36 +47,8 @@ export function MenuBrowser() {
 
   return (
     <div>
-      {/*
-        Barre de recherche collante, pleine largeur : le client garde la
-        recherche sous le pouce. Le fond doit couvrir toute la fenêtre, sinon le
-        contenu défile visiblement dans les gouttières sur grand écran.
-      */}
-      <div className="sticky top-16 z-20 border-b border-hairline bg-ink/95 backdrop-blur short:static">
-        <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-3">
-          <label className="relative flex-1">
-            <span className="sr-only">Rechercher un plat ou un ingrédient</span>
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Chercher : crevettes, chèvre, nutella…"
-              enterKeyHint="search"
-              autoComplete="off"
-              className="w-full rounded-full border border-control bg-surface px-4 py-2.5 text-base text-white placeholder:text-muted focus:border-red sm:text-sm"
-            />
-          </label>
-          {isFiltering ? (
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="min-h-10 shrink-0 rounded-full px-2 text-sm text-muted underline underline-offset-4 hover:text-white"
-            >
-              Effacer<span className="sr-only"> la recherche</span>
-            </button>
-          ) : null}
-        </div>
-      </div>
+      {/* Aucun résultat : la barre ne garde que la puce pour effacer la recherche. */}
+      <CategoryBar categories={filtered} query={query} onClearQuery={resetFilters} />
 
       {/* Nombre de résultats annoncé aux lecteurs d'écran pendant la saisie. */}
       <p role="status" className="sr-only">
@@ -93,7 +67,11 @@ export function MenuBrowser() {
           </button>
         </div>
       ) : (
-        <div className="mx-auto max-w-3xl space-y-12 px-4 py-10">
+        <div
+          id="menu-liste"
+          tabIndex={-1}
+          className="mx-auto max-w-3xl space-y-12 px-4 py-10 outline-none"
+        >
           {filtered.map((category) => (
             <section
               key={category.id}

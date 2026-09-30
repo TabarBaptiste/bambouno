@@ -42,9 +42,10 @@ html {
   scroll-behavior: smooth;
   /*
    * Le header et la barre de filtres collants ne doivent masquer ni les
-   * ancres de section, ni l'élément qui reçoit le focus (WCAG 2.4.11).
+   * ancres de section, ni l'élément qui reçoit le focus (WCAG 2.4.11) :
+   * header (4rem) + barre de rubriques (~3.5rem) + un peu d'air.
    */
-  scroll-padding-top: 9.5rem;
+  scroll-padding-top: 8rem;
   background-color: var(--color-ink);
   color-scheme: dark;
 }
