@@ -43,6 +43,12 @@ export type MenuCategory = {
   /** Nom au pluriel pour le compteur, ex. « 15 pizzas ». */
   unit: string;
   visual: DishVisual;
+  /**
+   * Ce qu'est le plat, en tête de sa ligne dans le message WhatsApp et le
+   * panier (« Pizza sucrée À la banane »). Sans ça, « À la banane » ne dit rien
+   * à quelqu'un qui découvre la carte. Vide quand le nom suffit (boissons).
+   */
+  orderLabel?: string;
   /** Précision utile uniquement (supplément, commande à l'avance, loi). */
   subtitle?: string;
   items: MenuItem[];
@@ -55,6 +61,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "tomate",
     unit: "pizzas",
     visual: "pizza-tomate",
+    orderLabel: "Pizza",
     subtitle: "Toutes garnies d'emmental râpé.",
     items: [
       {
@@ -173,6 +180,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "crème",
     unit: "pizzas",
     visual: "pizza-creme",
+    orderLabel: "Pizza",
     items: [
       {
         id: "c-savoyarde",
@@ -210,6 +218,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "pêcheur",
     unit: "pizzas",
     visual: "pizza-tomate",
+    orderLabel: "Pizza pêcheur",
     subtitle: "La Langoustine est à commander à l'avance.",
     items: [
       {
@@ -273,6 +282,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "calzones",
     unit: "calzones",
     visual: "calzone",
+    orderLabel: "Calzone",
     items: [
       {
         id: "cz-classique",
@@ -296,6 +306,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "friands",
     unit: "friands",
     visual: "friand",
+    orderLabel: "Friand",
     items: [
       {
         id: "f-gros-mornaise",
@@ -335,6 +346,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "salées",
     unit: "crêpes",
     visual: "crepe-salee",
+    orderLabel: "Crêpe salée",
     items: [
       {
         id: "cs-hibiscus",
@@ -409,6 +421,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "sucrées",
     unit: "pizzas",
     visual: "pizza-sucree",
+    orderLabel: "Pizza sucrée",
     items: [
       {
         id: "ps-banane",
@@ -447,6 +460,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "sucrées",
     unit: "crêpes",
     visual: "crepe-sucree",
+    orderLabel: "Crêpe sucrée",
     subtitle: "Suppléments crème chocolat, caramel liquide ou sirop d'érable : 0,50 €.",
     items: [
       { id: "cu-nature", name: "Nature", price: 3.5, tags: ["sucre"] },
@@ -529,6 +543,7 @@ export const menu: MenuCategory[] = [
     titleAccent: "bières",
     unit: "bières",
     visual: "biere",
+    orderLabel: "Bière",
     // Mention obligatoire dès qu'on affiche des boissons alcoolisées.
     subtitle:
       "La vente d'alcool est interdite aux mineurs de moins de 18 ans. L'abus d'alcool est dangereux pour la santé, à consommer avec modération.",
@@ -545,6 +560,19 @@ export const menu: MenuCategory[] = [
 export const menuIndex: Record<string, MenuItem> = Object.fromEntries(
   menu.flatMap((category) => category.items.map((item) => [item.id, item])),
 );
+
+/** Index plat id → rubrique, pour retrouver ce qu'est un plat du panier. */
+export const categoryOf: Record<string, MenuCategory> = Object.fromEntries(
+  menu.flatMap((category) => category.items.map((item) => [item.id, category])),
+);
+
+/** Titre court pour les puces de navigation : « Calzones », « Pizzas tomate ». */
+export function shortTitle(category: MenuCategory): string {
+  const accent = category.titleAccent;
+  return category.titlePrefix === "Nos"
+    ? accent.charAt(0).toUpperCase() + accent.slice(1)
+    : `${category.titlePrefix} ${accent}`;
+}
 
 export const tagLabels: Record<NonNullable<MenuItem["tags"]>[number], string> = {
   vegetarien: "Végé",

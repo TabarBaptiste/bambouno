@@ -48,7 +48,7 @@ test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async 
   await expect(cart).toBeVisible();
 
   // Modifier dans le panier.
-  await cart.getByRole("button", { name: "Retirer 4 Fromages" }).click();
+  await cart.getByRole("button", { name: "Retirer Pizza 4 Fromages" }).click();
   await expect(cart.getByText("Quantité : 1")).toBeAttached();
 
   // Le prénom est obligatoire.
@@ -64,7 +64,7 @@ test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async 
   const popup = await popupPromise;
   const text = new URL(popup.url()).searchParams.get("text");
   expect(text).toContain("c'est Léa");
-  expect(text).toContain("1 × 4 Fromages");
+  expect(text).toContain("1 × Pizza 4 Fromages");
   expect(text).not.toContain("€");
   await expect(cart).toBeHidden();
 });
@@ -102,16 +102,74 @@ test("le panier et le prénom survivent au rechargement", async ({ page }) => {
   await expect(page.getByRole("textbox", { name: "Votre prénom" })).toHaveValue("Marc");
 });
 
-test("la recherche ignore les accents", async ({ page }) => {
+test("le message WhatsApp dit ce qu'est chaque plat, à plat, sans prix", async ({ page }) => {
   await page.goto("/");
+  for (const name of ["Ajouter Exotique", "Ajouter À la banane", "Ajouter Crevettes à la crème"]) {
+    await page.getByRole("button", { name }).click();
+  }
+  await page.getByRole("button", { name: /Voir le panier/ }).click();
+  const cart = page.getByRole("dialog", { name: "Votre panier" });
+  // Le panier montre ce qui sera envoyé.
+  await expect(cart).toContainText("Pizza sucrée À la banane");
+  await expect(cart).toContainText("Pizza pêcheur Crevettes à la crème");
+
+  await cart.getByRole("textbox", { name: "Votre prénom" }).fill("Léa");
+  const popupPromise = page.waitForEvent("popup");
+  await cart.getByRole("button", { name: /Commander sur WhatsApp/ }).click();
+  const text = new URL((await popupPromise).url()).searchParams.get("text");
+  expect(text).toContain(
+    "• 1 × Pizza Exotique\n• 1 × Pizza sucrée À la banane\n• 1 × Pizza pêcheur Crevettes à la crème",
+  );
+  expect(text).not.toMatch(/€|total/i);
+});
+
+async function search(page: import("@playwright/test").Page, text: string) {
+  await page.getByRole("button", { name: "Rechercher" }).click();
+  await page.getByRole("searchbox").fill(text);
+}
+
+test("la recherche est dans le header et ignore les accents", async ({ page }) => {
+  await page.goto("/");
+  // Plus de champ de recherche dans la page : il faut ouvrir celui du header.
+  await expect(page.getByRole("searchbox")).toBeHidden();
+  await page.getByRole("button", { name: "Rechercher" }).click();
+  await expect(page.getByRole("searchbox")).toBeFocused();
+
   await page.getByRole("searchbox").fill("chevre");
   await expect(page.getByRole("heading", { name: "4 Fromages" })).toBeVisible();
   await expect(page.getByRole("status").filter({ hasText: /correspond/ })).toBeAttached();
 });
 
+test("Entrée referme le champ, garde le filtre et amène aux résultats", async ({ page }) => {
+  await page.goto("/");
+  await search(page, "banane");
+  await page.keyboard.press("Enter");
+
+  await expect(page.getByRole("searchbox")).toBeHidden();
+  await expect(page.locator("#menu-liste")).toBeInViewport();
+  await expect(page.getByRole("heading", { name: "À la banane" })).toBeInViewport();
+  // Le filtre est signalé même champ fermé : pastille sur la loupe et puce dans la barre.
+  await expect(page.getByRole("button", { name: /recherche en cours : banane/ })).toBeVisible();
+  const clear = page.getByRole("button", { name: "Effacer la recherche : banane" });
+  await expect(clear).toBeVisible();
+
+  await clear.click();
+  await expect(clear).toBeHidden();
+  await expect(page.locator("#boissons")).toBeAttached();
+});
+
+test("Échap referme le champ de recherche et rend le focus à la loupe", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Rechercher" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("searchbox")).toBeHidden();
+  await expect(page.getByRole("button", { name: "Rechercher" })).toBeFocused();
+});
+
 test("une rubrique masquée par la recherche réapparaît au clic", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("searchbox").fill("banane");
+  await search(page, "banane");
+  await page.keyboard.press("Enter");
   await expect(page.locator("#boissons")).toHaveCount(0);
 
   await page
@@ -120,7 +178,39 @@ test("une rubrique masquée par la recherche réapparaît au clic", async ({ pag
     .click();
 
   await expect(page.locator("#boissons")).toBeInViewport();
+  await page.getByRole("button", { name: /Rechercher/ }).click();
   await expect(page.getByRole("searchbox")).toHaveValue("");
+});
+
+test("la barre de rubriques suit le défilement et recentre la puce active", async ({ page }) => {
+  await page.goto("/");
+  const bar = page.getByRole("navigation", { name: "Aller à une rubrique" });
+
+  await page.evaluate(() => document.getElementById("boissons")?.scrollIntoView({ behavior: "instant" }));
+  const boissons = bar.getByRole("link", { name: "Boissons" });
+  await expect(boissons).toHaveAttribute("aria-current", "true");
+  // La barre reste collée sous le header et la puce active est visible dans son défilement.
+  await expect(bar).toBeInViewport();
+  await expect(boissons).toBeInViewport({ ratio: 0.99 });
+
+  await page.evaluate(() => document.getElementById("friands")?.scrollIntoView({ behavior: "instant" }));
+  const friands = bar.getByRole("link", { name: "Friands" });
+  await expect(friands).toHaveAttribute("aria-current", "true");
+  await expect(boissons).not.toHaveAttribute("aria-current", "true");
+  await expect(friands).toBeInViewport({ ratio: 0.99 });
+});
+
+test("toucher une puce mène à la rubrique et la met en avant", async ({ page }) => {
+  await page.goto("/");
+  await page.evaluate(() => document.getElementById("pizzas-tomate")?.scrollIntoView({ behavior: "instant" }));
+  const bar = page.getByRole("navigation", { name: "Aller à une rubrique" });
+
+  await bar.getByRole("link", { name: "Bières" }).click();
+  await expect(page.locator("#bieres")).toBeInViewport();
+  await expect(bar.getByRole("link", { name: "Bières" })).toHaveAttribute("aria-current", "true");
+  // Pas de saut d'une puce à l'autre une fois arrivé.
+  await page.waitForTimeout(1200);
+  await expect(bar.getByRole("link", { name: "Bières" })).toHaveAttribute("aria-current", "true");
 });
 
 test("le menu burger mène aux horaires et à l'adresse", async ({ page }) => {

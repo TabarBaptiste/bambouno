@@ -47,10 +47,26 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
     await expectNoAxeViolations(page, "header");
   });
 
-  test("avec une recherche active", async ({ page }) => {
+  test("champ de recherche ouvert dans le header", async ({ page }) => {
     await page.goto("/");
+    await page.getByRole("button", { name: "Rechercher" }).click();
     await page.getByRole("searchbox").fill("banane");
+    await expectNoAxeViolations(page, "header");
+  });
+
+  test("avec une recherche active, champ refermé", async ({ page }) => {
+    await page.goto("/");
+    await page.getByRole("button", { name: "Rechercher" }).click();
+    await page.getByRole("searchbox").fill("banane");
+    await page.keyboard.press("Enter");
+    await expect(page.getByRole("searchbox")).toBeHidden();
     await expectNoAxeViolations(page);
+  });
+
+  test("barre de rubriques collée en bas de carte", async ({ page }) => {
+    await page.goto("/#bieres");
+    await expect(page.locator("#bieres")).toBeInViewport();
+    await expectNoAxeViolations(page, "nav[aria-label='Aller à une rubrique']");
   });
 
   test("page 404", async ({ page }) => {

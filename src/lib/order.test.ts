@@ -5,6 +5,7 @@ import {
   cartTotal,
   cleanName,
   MAX_NAME_LENGTH,
+  orderName,
   whatsappUrl,
 } from "@/lib/order";
 import { menuIndex } from "@/data/menu";
@@ -25,7 +26,38 @@ describe("panier", () => {
   });
 });
 
+describe("orderName", () => {
+  it("précise ce qu'est le plat", () => {
+    expect(orderName("p-exotique")).toBe("Pizza Exotique");
+    expect(orderName("ps-banane")).toBe("Pizza sucrée À la banane");
+    expect(orderName("cu-banane")).toBe("Crêpe sucrée Banane");
+  });
+
+  it("ne répète pas le type quand le nom le contient déjà", () => {
+    expect(orderName("bi-lorraine")).toBe("Bière Lorraine 25 cl");
+  });
+
+  it("laisse le nom seul quand la rubrique n'a pas de libellé (boissons)", () => {
+    expect(orderName("b-coca")).toBe("Coca-Cola 50 cl");
+  });
+
+  it("renvoie une chaîne vide pour un plat retiré de la carte", () => {
+    expect(orderName("plat-supprime")).toBe("");
+  });
+});
+
 describe("message WhatsApp", () => {
+  it("liste à plat, dans l'ordre du panier, avec le type de chaque plat", () => {
+    const message = buildOrderMessage([
+      { id: "p-exotique", quantity: 1 },
+      { id: "ps-banane", quantity: 2 },
+      { id: "b-coca", quantity: 1 },
+    ]);
+    expect(message).toContain(
+      "• 1 × Pizza Exotique\n• 2 × Pizza sucrée À la banane\n• 1 × Coca-Cola 50 cl",
+    );
+  });
+
   it("propose un message simple quand le panier est vide", () => {
     expect(buildOrderMessage([])).toBe(`Bonjour ${site.name} 👋\n\nJe voudrais passer une commande.`);
   });
@@ -44,7 +76,7 @@ describe("message WhatsApp", () => {
       { id: pizza.id, quantity: 2 },
       { id: drink.id, quantity: 1 },
     ]);
-    expect(message).toContain(`• 2 × ${pizza.name}\n• 1 × ${drink.name}`);
+    expect(message).toContain(`• 2 × Pizza ${pizza.name}\n• 1 × ${drink.name}`);
     expect(message).not.toMatch(/€|total/i);
   });
 
