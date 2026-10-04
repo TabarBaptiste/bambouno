@@ -96,7 +96,7 @@ des tests de parcours clavier.
   recherche, panier) mais le bouton « Commander sur WhatsApp » est désactivé
   (`aria-disabled`, donc lisible au clavier et au lecteur d'écran) avec
   « Fermé • Ouvre à 17h30 » ou « Fermé • Ouvre lundi à 17h30 » : personne ne
-  lirait le message avant l'ouverture. Le panier est conservé. Le statut est
+  lirait le message avant l'ouverture. Le statut est
   recalculé chaque minute, y compris panier ouvert.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
   et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »

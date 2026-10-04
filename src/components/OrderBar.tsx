@@ -253,12 +253,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
 
             {/* Région live toujours présente : l'annonce suit un passage à « fermé » pendant que le panier est ouvert. */}
             <p id={closedId} role="status" className={closed ? "mt-5 text-sm text-white" : "sr-only"}>
-              {closed ? (
-                <>
-                  <strong className="font-semibold">{openState.label}.</strong> Votre panier est
-                  conservé, vous pourrez commander à l&apos;ouverture.
-                </>
-              ) : null}
+              {closed ? <strong className="font-semibold">{openState.label}</strong> : null}
             </p>
 
             {/*
