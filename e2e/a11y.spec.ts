@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
+import { fixerHeure, MARTINIQUE } from "./horloge";
 
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 
@@ -32,6 +33,7 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
   });
 
   test("panneau du panier, avec l'erreur de prénom", async ({ page }) => {
+    await fixerHeure(page, MARTINIQUE.ouvert);
     await page.goto("/");
     await page.getByRole("button", { name: "Ajouter 4 Fromages" }).click();
     await page.getByRole("button", { name: /Voir le panier/ }).click();
@@ -60,6 +62,16 @@ test.describe("accessibilité (axe, WCAG 2.2 AA)", () => {
     await page.getByRole("searchbox").fill("banane");
     await page.keyboard.press("Enter");
     await expectNoAxeViolations(page);
+  });
+
+  test("panneau du panier hors horaires, bouton désactivé", async ({ page }) => {
+    await fixerHeure(page, MARTINIQUE.ferme);
+    await page.goto("/");
+    await page.getByRole("button", { name: "Ajouter 4 Fromages" }).click();
+    await page.getByRole("button", { name: /Voir le panier/ }).click();
+    const cart = page.getByRole("dialog", { name: "Votre panier" });
+    await expect(cart.getByRole("status")).toContainText("Fermé");
+    await expectNoAxeViolations(page, "dialog");
   });
 
   test("barre de rubriques collée en bas de carte", async ({ page }) => {

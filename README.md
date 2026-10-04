@@ -27,7 +27,7 @@ request et chaque push sur `main` :
 | Job | Ce qu'il bloque |
 |---|---|
 | Lint, types, tests unitaires, build | ESLint (`next/core-web-vitals` + `jsx-a11y` strict), TypeScript, Vitest (horaires, panier, message WhatsApp, recherche, intégrité de `menu.ts`), `next build` |
-| E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, barre et panneau du panier, recherche, 404), parcours de commande au clavier jusqu'à WhatsApp, prénom obligatoire, persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
+| E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, barre et panneau du panier, recherche, 404), parcours de commande au clavier jusqu'à WhatsApp, prénom obligatoire, commande désactivée hors horaires (horloge du navigateur figée : les tests ne dépendent jamais de l'heure réelle, cf. `e2e/horloge.ts`), persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
 | Audit | `npm audit` sur les dépendances de production, niveau *high* et plus |
 
 Dependabot propose chaque semaine les mises à jour mineures et correctifs.
@@ -92,6 +92,12 @@ des tests de parcours clavier.
   précédé de son type (« Pizza sucrée À la banane », « Crêpe sucrée
   Nutella ») : `orderLabel` de chaque rubrique dans `src/data/menu.ts`. Pas
   d'envoi accidentel. Panier et prénom survivent à un rechargement.
+  **Hors des horaires d'ouverture**, le site s'utilise normalement (carte,
+  recherche, panier) mais le bouton « Commander sur WhatsApp » est désactivé
+  (`aria-disabled`, donc lisible au clavier et au lecteur d'écran) avec
+  « Fermé • Ouvre à 17h30 » ou « Fermé • Ouvre lundi à 17h30 » : personne ne
+  lirait le message avant l'ouverture. Le panier est conservé. Le statut est
+  recalculé chaque minute, y compris panier ouvert.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
   et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »
   (plus « ferme à 22h » dans la dernière heure) ou « Fermé • Ouvre à 17h30 »,
