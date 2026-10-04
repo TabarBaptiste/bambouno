@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { formatPrice, menuIndex } from "@/data/menu";
 import { useOrder } from "@/components/OrderProvider";
+import { useOpenState } from "@/components/useOpenState";
 import { NewTabHint } from "@/components/NewTabHint";
 import { cleanName, MAX_NAME_LENGTH, orderName, sortByMenu, whatsappUrl } from "@/lib/order";
 import { WhatsAppIcon } from "@/components/icons";
@@ -106,6 +107,14 @@ function CartPanel({ onClose }: { onClose: () => void }) {
   const nameInput = useRef<HTMLInputElement>(null);
   const nameId = useId();
   const errorId = useId();
+  const closedId = useId();
+
+  // Hors horaires, tout fonctionne sauf l'envoi sur WhatsApp : personne ne
+  // lirait le message avant l'ouverture. Tant que le statut n'est pas calculé
+  // (`null`), on n'ouvre pas la porte non plus.
+  const openState = useOpenState();
+  const canOrder = openState?.isOpen === true;
+  const closed = openState !== null && !openState.isOpen;
 
   const removeOne = (id: string, quantity: number) => {
     remove(id);
@@ -115,6 +124,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
 
   const order = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!canOrder) return;
     if (!cleanName(name)) {
       setError(true);
       nameInput.current?.focus();
@@ -241,10 +251,33 @@ function CartPanel({ onClose }: { onClose: () => void }) {
               </p>
             ) : null}
 
-            <button type="submit" className="btn-primary mt-5 w-full text-base">
+            {/* Région live toujours présente : l'annonce suit un passage à « fermé » pendant que le panier est ouvert. */}
+            <p id={closedId} role="status" className={closed ? "mt-5 text-sm text-white" : "sr-only"}>
+              {closed ? (
+                <>
+                  <strong className="font-semibold">{openState.label}.</strong> Votre panier est
+                  conservé, vous pourrez commander à l&apos;ouverture.
+                </>
+              ) : null}
+            </p>
+
+            {/*
+              aria-disabled et non disabled : le bouton reste atteignable au
+              clavier et au lecteur d'écran, qui lit pourquoi il est inactif.
+            */}
+            <button
+              type="submit"
+              aria-disabled={!canOrder || undefined}
+              aria-describedby={closed ? closedId : undefined}
+              className={
+                canOrder
+                  ? "btn-primary mt-5 w-full text-base"
+                  : "mt-5 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-control bg-surface-raised px-6 py-3.5 font-heading text-base font-semibold uppercase tracking-wide text-muted"
+              }
+            >
               <WhatsAppIcon className="size-5" />
               Commander sur WhatsApp
-              <NewTabHint />
+              {canOrder ? <NewTabHint /> : null}
             </button>
           </form>
         </>
