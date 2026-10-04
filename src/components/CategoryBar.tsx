@@ -20,7 +20,10 @@ const CLICK_LOCK_MS = 900;
 export function CategoryBar({ categories }: { categories: MenuCategory[] }) {
   const [active, setActive] = useState<string | null>(null);
   const list = useRef<HTMLUListElement>(null);
-  const lockedUntil = useRef(0);
+  // Vrai pendant le trajet d'un clic sur une puce. Un drapeau et une minuterie
+  // plutôt qu'une comparaison d'heures : aucune dépendance à l'horloge.
+  const locked = useRef(false);
+  const unlockTimer = useRef<number | undefined>(undefined);
   const ids = categories.map((category) => category.id).join(",");
 
   const findCurrent = useCallback(() => {
@@ -39,7 +42,7 @@ export function CategoryBar({ categories }: { categories: MenuCategory[] }) {
     let frame = 0;
     const update = () => {
       frame = 0;
-      if (Date.now() < lockedUntil.current) return;
+      if (locked.current) return;
       setActive(findCurrent());
     };
     const schedule = () => {
@@ -54,6 +57,8 @@ export function CategoryBar({ categories }: { categories: MenuCategory[] }) {
       window.removeEventListener("resize", schedule);
     };
   }, [findCurrent]);
+
+  useEffect(() => () => window.clearTimeout(unlockTimer.current), []);
 
   // Recentre la puce active dans la barre, sans jamais faire défiler la page.
   useEffect(() => {
@@ -71,8 +76,13 @@ export function CategoryBar({ categories }: { categories: MenuCategory[] }) {
     // Le défilement de la page traverse les rubriques intermédiaires : on fige
     // la puce choisie le temps du trajet, puis on la recale sur la réalité.
     setActive(id);
-    lockedUntil.current = Date.now() + CLICK_LOCK_MS;
-    window.setTimeout(() => setActive(findCurrent()), CLICK_LOCK_MS + 50);
+    locked.current = true;
+    // Un second clic repart pour une durée complète : on annule la précédente.
+    window.clearTimeout(unlockTimer.current);
+    unlockTimer.current = window.setTimeout(() => {
+      locked.current = false;
+      setActive(findCurrent());
+    }, CLICK_LOCK_MS + 50);
   };
 
   const chip =
