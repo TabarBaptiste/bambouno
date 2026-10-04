@@ -374,3 +374,18 @@ test.describe("hors des horaires d'ouverture", () => {
     await expect(cart.getByRole("status")).toContainText("Fermé");
   });
 });
+
+test("la puce active se recale même si le défilement arrive après le verrou du clic", async ({ page }) => {
+  // Serveur lent : le trajet fluide n'aboutit qu'après les 900 ms de verrou.
+  // Avec l'horloge figée, l'ancien verrou (fondé sur Date.now) ne se libérait jamais.
+  await page.goto("/");
+  await page.evaluate(() => document.getElementById("pizzas-tomate")?.scrollIntoView({ behavior: "instant" }));
+  const bar = page.getByRole("navigation", { name: "Aller à une rubrique" });
+  await bar.getByRole("link", { name: "Bières" }).click();
+  // On annule le trajet fluide et on laisse passer le verrou avant d'arriver.
+  await page.evaluate(() => window.scrollTo({ top: 1500, behavior: "instant" }));
+  await page.waitForTimeout(1300);
+  await page.evaluate(() => document.getElementById("bieres")?.scrollIntoView({ behavior: "instant" }));
+  await expect(page.locator("#bieres")).toBeInViewport();
+  await expect(bar.getByRole("link", { name: "Bières" })).toHaveAttribute("aria-current", "true");
+});
