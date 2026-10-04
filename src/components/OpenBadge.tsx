@@ -1,26 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getOpenState, type OpenState } from "@/lib/hours";
+import { useOpenState } from "@/components/useOpenState";
 
-/**
- * Statut ouvert/fermé en temps réel.
- *
- * Calculé côté client uniquement : le HTML est généré au build (ISR), donc un
- * statut rendu au serveur serait périmé et provoquerait une erreur
- * d'hydratation. On réserve la place du badge tant que le JS n'a pas pris
- * la main - jamais un statut potentiellement faux.
- */
+/** Badge « Ouvert » / « Fermé • Ouvre à 17h30 » (voir useOpenState). */
 export function OpenBadge({ className = "" }: { className?: string }) {
-  const [state, setState] = useState<OpenState | null>(null);
-
-  useEffect(() => {
-    const update = () => setState(getOpenState());
-    update();
-    // Une minute suffit : la précision utile est celle de l'heure d'ouverture.
-    const timer = window.setInterval(update, 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
+  const state = useOpenState();
 
   if (!state) {
     // Emplacement vide de la taille du badge, le temps du calcul : pas de
