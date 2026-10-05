@@ -60,12 +60,12 @@ describe("message WhatsApp", () => {
   });
 
   it("propose un message simple quand le panier est vide", () => {
-    expect(buildOrderMessage([])).toBe(`Bonjour ${site.name} 👋\n\nJe voudrais passer une commande.`);
+    expect(buildOrderMessage([])).toBe(`Bonjour ${site.name}\n\nJe voudrais passer une commande.`);
   });
 
   it("se présente avec le prénom, nettoyé", () => {
     const message = buildOrderMessage([{ id: pizza.id, quantity: 1 }], "  Marie   Lou ");
-    expect(message.split("\n")[0]).toBe(`Bonjour ${site.name}, c'est Marie Lou 👋`);
+    expect(message.split("\n")[0]).toBe(`Bonjour ${site.name}, c'est Marie Lou`);
   });
 
   it("borne la longueur du prénom", () => {
