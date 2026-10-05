@@ -80,8 +80,8 @@ export function buildOrderMessage(lines: CartLine[], name = ""): string {
 
   const firstName = cleanName(name);
   const greeting = firstName
-    ? `Bonjour ${site.name}, c'est ${firstName} 👋`
-    : `Bonjour ${site.name} 👋`;
+    ? `Bonjour ${site.name}, c'est ${firstName}`
+    : `Bonjour ${site.name}`;
 
   if (rows.length === 0) {
     return `${greeting}\n\nJe voudrais passer une commande.`;
