@@ -9,7 +9,6 @@ import { OrderBar } from "@/components/OrderBar";
 import { OrderProvider } from "@/components/OrderProvider";
 import { SearchProvider } from "@/components/SearchProvider";
 import { SectionTitle } from "@/components/SectionTitle";
-import { menu } from "@/data/menu";
 
 /**
  * Page unique : la carte tient dans un seul défilement, avec ancres.
@@ -33,10 +32,7 @@ export default function HomePage() {
               collante doit être pleine largeur, elle ne peut pas vivre ici.
             */}
             <div data-hors-recherche className="mx-auto max-w-5xl px-4">
-              <div className="flex items-baseline justify-between gap-4">
-                <SectionTitle id="carte-titre" prefix="La" accent="carte" />
-                <p className="shrink-0 text-sm text-muted">{menu.length} rubriques</p>
-              </div>
+              <SectionTitle id="carte-titre" prefix="La" accent="carte" />
               <CategoryGrid />
             </div>
             <MenuBrowser />

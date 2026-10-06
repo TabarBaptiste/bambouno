@@ -18,7 +18,7 @@ export function MapEmbed() {
         src={site.mapsEmbedUrl}
         title={`Plan d'accès à ${site.name}, ${site.address.city}`}
         loading="lazy"
-        referrerPolicy="no-referrer-when-downgrade"
+        referrerPolicy="strict-origin-when-cross-origin"
         className="aspect-[4/3] w-full rounded-card border border-hairline"
       />
     );
