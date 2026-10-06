@@ -1,8 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
-import { formatPrice, type DishVisual, type MenuItem } from "@/data/menu";
+import { useRef, useState } from "react";
+import {
+  formatPrice,
+  lineId,
+  type DishVisual,
+  type MenuExtra,
+  type MenuItem,
+} from "@/data/menu";
 import { DishIllustration } from "@/components/DishIllustration";
 import { ChiliIcon, FishIcon, LeafIcon } from "@/components/icons";
 import { useOrder } from "@/components/OrderProvider";
@@ -17,16 +23,29 @@ const TAG_ICONS = {
   epice: { Icon: ChiliIcon, label: "Épicé", color: "text-red-text" },
 } as const;
 
-export function MenuItemCard({ item, visual }: { item: MenuItem; visual: DishVisual }) {
+export function MenuItemCard({
+  item,
+  visual,
+  extras,
+}: {
+  item: MenuItem;
+  visual: DishVisual;
+  extras?: MenuExtra[];
+}) {
   const { quantityOf, add, remove } = useOrder();
-  const quantity = quantityOf(item.id);
+  // Supplément choisi pour les prochains ajouts ; le compteur suit cette version du plat.
+  const [extraId, setExtraId] = useState<string | null>(null);
+  const extra = extras?.find((candidate) => candidate.id === extraId);
+  const id = lineId(item.id, extra?.id);
+  const quantity = quantityOf(id);
+  const label = extra ? `${item.name}, supplément ${extra.name.toLowerCase()}` : item.name;
   const addButton = useRef<HTMLButtonElement>(null);
 
   const removeOne = () => {
     // Le bouton « − » disparaît quand la quantité retombe à zéro : on rend le
     // focus au bouton d'ajout pour ne pas perdre l'utilisateur clavier.
     if (quantity === 1) addButton.current?.focus();
-    remove(item.id);
+    remove(id);
   };
 
   const icons = (item.tags ?? []).flatMap((tag) =>
@@ -61,6 +80,24 @@ export function MenuItemCard({ item, visual }: { item: MenuItem; visual: DishVis
         ) : null}
         {item.note ? <p className="mt-1 text-xs font-medium text-mango">{item.note}</p> : null}
 
+        {extras ? (
+          <label className="mt-3 flex items-center gap-2 text-sm text-muted">
+            <span className="shrink-0">Supplément</span>
+            <select
+              value={extraId ?? ""}
+              onChange={(event) => setExtraId(event.target.value || null)}
+              className="min-h-11 min-w-0 flex-1 rounded-full border border-control bg-surface px-3 text-base text-white"
+            >
+              <option value="">Aucun</option>
+              {extras.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.name} (+{formatPrice(option.price)})
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
         {/*
           Sous le texte, « + » toujours au même endroit, à droite : on peut
           taper deux fois vite sans que le bouton bouge. Le « − » et la
@@ -73,7 +110,7 @@ export function MenuItemCard({ item, visual }: { item: MenuItem; visual: DishVis
               <button
                 type="button"
                 onClick={removeOne}
-                aria-label={`Retirer ${item.name}`}
+                aria-label={`Retirer ${label}`}
                 className="flex size-11 items-center justify-center rounded-full border border-control text-2xl leading-none text-white transition-colors hover:border-red hover:text-red-text"
               >
                 <span aria-hidden>−</span>
@@ -87,8 +124,8 @@ export function MenuItemCard({ item, visual }: { item: MenuItem; visual: DishVis
           <button
             ref={addButton}
             type="button"
-            onClick={() => add(item.id)}
-            aria-label={`Ajouter ${item.name}`}
+            onClick={() => add(id)}
+            aria-label={`Ajouter ${label}`}
             className="flex size-11 items-center justify-center rounded-full bg-red-cta text-2xl leading-none text-white transition-colors hover:bg-red-dark"
           >
             <span aria-hidden>+</span>

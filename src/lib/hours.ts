@@ -23,7 +23,7 @@ export function formatHour(hhmm: string): string {
 /**
  * Jour de la semaine et minutes écoulées depuis minuit, dans le fuseau du
  * restaurant - pas celui du visiteur. Un client en métropole doit voir
- * l'ouverture réelle à Gros-Morne.
+ * l'ouverture réelle au Gros-Morne.
  */
 export function nowInMartinique(date = new Date()): { day: number; minutes: number } {
   const parts = new Intl.DateTimeFormat("en-US", {
