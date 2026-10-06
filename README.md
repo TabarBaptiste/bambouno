@@ -159,15 +159,16 @@ ombre rouge diffuse. Tokens définis dans `src/app/globals.css`.
 
 ## Déploiement
 
-Build entièrement statique → **Vercel** (Hobby pour la démo, Pro si usage
-commercial) ou Netlify. Domaine conseillé : `bambouno-pizza.fr` chez OVH.
+Build entièrement statique → **Netlify** (plan Free pour l'essai, Personal dès
+que le restaurant est client payant : les déploiements consomment des crédits).
+Vercel Hobby est exclu, il interdit l'usage commercial.
 Penser à ajouter le lien du site sur la fiche Google Business.
 
 Définir **`NEXT_PUBLIC_SITE_URL`** (ex. `https://bambouno-pizza.fr`) en
 production : elle sert au canonical, à l'aperçu Open Graph (image générée par
 `src/app/opengraph-image.tsx`, affichée quand le lien est partagé sur
-WhatsApp), au `sitemap.xml` et au `robots.txt`. Sur Vercel, le domaine de
-production du projet est utilisé à défaut.
+WhatsApp), au `sitemap.xml` et au `robots.txt`. Sans elle, le site
+retombe sur `http://localhost:3000`.
 
 Définir **`NEXT_PUBLIC_UMAMI_WEBSITE_ID`** pour activer les statistiques
 Umami (sans cookies). Événements suivis : `whatsapp-click` (commande envoyée
