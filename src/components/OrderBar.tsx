@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { formatPrice, menuIndex } from "@/data/menu";
+import { formatPrice, resolveLine } from "@/data/menu";
 import { useOrder } from "@/components/OrderProvider";
 import { useOpenState } from "@/components/useOpenState";
 import { NewTabHint } from "@/components/NewTabHint";
@@ -176,8 +176,9 @@ function CartPanel({ onClose }: { onClose: () => void }) {
         <>
           <ul className="mt-4 divide-y divide-hairline border-y border-hairline">
             {sortByMenu(lines).map((line) => {
-              const item = menuIndex[line.id];
-              if (!item) return null;
+              const resolved = resolveLine(line.id);
+              if (!resolved) return null;
+              const unitPrice = resolved.item.price + (resolved.extra?.price ?? 0);
               return (
                 <li key={line.id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
@@ -185,7 +186,7 @@ function CartPanel({ onClose }: { onClose: () => void }) {
                       {orderName(line.id)}
                     </p>
                     <p className="text-sm text-muted">
-                      {formatPrice(item.price * line.quantity)}
+                      {formatPrice(unitPrice * line.quantity)}
                     </p>
                   </div>
                   <button

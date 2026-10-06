@@ -34,6 +34,14 @@ export type DishVisual =
   | "boisson"
   | "biere";
 
+/** Supplément au choix sur les plats d'une rubrique (un seul par plat). */
+export type MenuExtra = {
+  id: string;
+  name: string;
+  /** Ajouté au prix du plat. */
+  price: number;
+};
+
 export type MenuCategory = {
   id: string;
   /** Titre court, en deux temps : premier mot en blanc… */
@@ -51,6 +59,8 @@ export type MenuCategory = {
   orderLabel?: string;
   /** Précision utile uniquement (supplément, commande à l'avance, loi). */
   subtitle?: string;
+  /** Suppléments proposés sur chaque plat de la rubrique. */
+  extras?: MenuExtra[];
   items: MenuItem[];
 };
 
@@ -341,6 +351,107 @@ export const menu: MenuCategory[] = [
     ],
   },
   {
+    id: "pizzas-sucrees",
+    titlePrefix: "Pizzas",
+    titleAccent: "sucrées",
+    unit: "pizzas",
+    visual: "pizza-sucree",
+    orderLabel: "Pizza sucrée",
+    items: [
+      {
+        id: "ps-banane",
+        name: "À la banane",
+        price: 10,
+        description: "Crème liquide, bananes, cassonade, citron",
+        tags: ["sucre", "vegetarien"],
+      },
+      {
+        id: "ps-pommes",
+        name: "Aux pommes",
+        price: 10,
+        description:
+          "Crème liquide, pomme, caramel au beurre salé, amandes grillées, cannelle",
+        tags: ["sucre", "vegetarien"],
+      },
+      {
+        id: "ps-poires",
+        name: "Aux poires",
+        price: 10,
+        description: "Crème liquide, gorgonzola, poires, noix, caramel",
+        tags: ["sucre", "vegetarien"],
+      },
+      {
+        id: "ps-nutella-banane",
+        name: "Nutella / Banane",
+        price: 10,
+        description: "Nutella, banane, noix",
+        tags: ["sucre", "vegetarien"],
+      },
+    ],
+  },
+  {
+    id: "crepes-sucrees",
+    titlePrefix: "Crêpes",
+    titleAccent: "sucrées",
+    unit: "crêpes",
+    visual: "crepe-sucree",
+    orderLabel: "Crêpe sucrée",
+    extras: [
+      { id: "x-creme-chocolat", name: "Crème chocolat", price: 0.5 },
+      { id: "x-caramel-liquide", name: "Caramel liquide", price: 0.5 },
+      { id: "x-sirop-erable", name: "Sirop d'érable", price: 0.5 },
+    ],
+    items: [
+      { id: "cu-nature", name: "Nature", price: 3.5, tags: ["sucre"] },
+      { id: "cu-sucre", name: "Sucre", price: 3.9, tags: ["sucre"] },
+      { id: "cu-miel", name: "Miel", price: 4, tags: ["sucre"] },
+      {
+        id: "cu-sucre-beurre-sale",
+        name: "Sucre beurre salé",
+        price: 4,
+        tags: ["sucre"],
+      },
+      { id: "cu-nutella", name: "Nutella", price: 4, tags: ["sucre"] },
+      {
+        id: "cu-nutella-amande",
+        name: "Nutella, amande",
+        price: 4.5,
+        tags: ["sucre"],
+      },
+      {
+        id: "cu-nutella-chantilly",
+        name: "Nutella, chantilly",
+        price: 4.5,
+        tags: ["sucre"],
+      },
+      {
+        id: "cu-compote-pomme",
+        name: "Compote de pomme",
+        price: 4.5,
+        note: "Confiture",
+        tags: ["sucre"],
+      },
+      {
+        id: "cu-abricot-pays",
+        name: "Abricot pays",
+        price: 4.5,
+        note: "Confiture",
+        tags: ["sucre"],
+      },
+      { id: "cu-banane", name: "Banane", price: 4.5, note: "Confiture", tags: ["sucre"] },
+      { id: "cu-goyave", name: "Goyave", price: 4.5, note: "Confiture", tags: ["sucre"] },
+      { id: "cu-fraise", name: "Fraise", price: 4.5, note: "Confiture", tags: ["sucre"] },
+      { id: "cu-ananas", name: "Ananas", price: 4.5, note: "Confiture", tags: ["sucre"] },
+      {
+        id: "cu-gingembre",
+        name: "Gingembre",
+        price: 4.5,
+        note: "Confiture",
+        tags: ["sucre"],
+      },
+    ],
+  },
+  {
     id: "crepes-salees",
     titlePrefix: "Crêpes",
     titleAccent: "salées",
@@ -416,103 +527,6 @@ export const menu: MenuCategory[] = [
     ],
   },
   {
-    id: "pizzas-sucrees",
-    titlePrefix: "Pizzas",
-    titleAccent: "sucrées",
-    unit: "pizzas",
-    visual: "pizza-sucree",
-    orderLabel: "Pizza sucrée",
-    items: [
-      {
-        id: "ps-banane",
-        name: "À la banane",
-        price: 10,
-        description: "Crème liquide, bananes, cassonade, citron",
-        tags: ["sucre", "vegetarien"],
-      },
-      {
-        id: "ps-pommes",
-        name: "Aux pommes",
-        price: 10,
-        description:
-          "Crème liquide, pomme, caramel au beurre salé, amandes grillées, cannelle",
-        tags: ["sucre", "vegetarien"],
-      },
-      {
-        id: "ps-poires",
-        name: "Aux poires",
-        price: 10,
-        description: "Crème liquide, gorgonzola, poires, noix, caramel",
-        tags: ["sucre", "vegetarien"],
-      },
-      {
-        id: "ps-nutella-banane",
-        name: "Nutella / Banane",
-        price: 10,
-        description: "Nutella, banane, noix",
-        tags: ["sucre", "vegetarien"],
-      },
-    ],
-  },
-  {
-    id: "crepes-sucrees",
-    titlePrefix: "Crêpes",
-    titleAccent: "sucrées",
-    unit: "crêpes",
-    visual: "crepe-sucree",
-    orderLabel: "Crêpe sucrée",
-    subtitle: "Suppléments crème chocolat, caramel liquide ou sirop d'érable : 0,50 €.",
-    items: [
-      { id: "cu-nature", name: "Nature", price: 3.5, tags: ["sucre"] },
-      { id: "cu-sucre", name: "Sucre", price: 3.9, tags: ["sucre"] },
-      { id: "cu-miel", name: "Miel", price: 4, tags: ["sucre"] },
-      {
-        id: "cu-sucre-beurre-sale",
-        name: "Sucre beurre salé",
-        price: 4,
-        tags: ["sucre"],
-      },
-      { id: "cu-nutella", name: "Nutella", price: 4, tags: ["sucre"] },
-      {
-        id: "cu-nutella-amande",
-        name: "Nutella, amande",
-        price: 4.5,
-        tags: ["sucre"],
-      },
-      {
-        id: "cu-nutella-chantilly",
-        name: "Nutella, chantilly",
-        price: 4.5,
-        tags: ["sucre"],
-      },
-      {
-        id: "cu-compote-pomme",
-        name: "Compote de pomme",
-        price: 4.5,
-        note: "Confiture",
-        tags: ["sucre"],
-      },
-      {
-        id: "cu-abricot-pays",
-        name: "Abricot pays",
-        price: 4.5,
-        note: "Confiture",
-        tags: ["sucre"],
-      },
-      { id: "cu-banane", name: "Banane", price: 4.5, note: "Confiture", tags: ["sucre"] },
-      { id: "cu-goyave", name: "Goyave", price: 4.5, note: "Confiture", tags: ["sucre"] },
-      { id: "cu-fraise", name: "Fraise", price: 4.5, note: "Confiture", tags: ["sucre"] },
-      { id: "cu-ananas", name: "Ananas", price: 4.5, note: "Confiture", tags: ["sucre"] },
-      {
-        id: "cu-gingembre",
-        name: "Gingembre",
-        price: 4.5,
-        note: "Confiture",
-        tags: ["sucre"],
-      },
-    ],
-  },
-  {
     id: "boissons",
     titlePrefix: "Nos",
     titleAccent: "boissons",
@@ -565,6 +579,28 @@ export const menuIndex: Record<string, MenuItem> = Object.fromEntries(
 export const categoryOf: Record<string, MenuCategory> = Object.fromEntries(
   menu.flatMap((category) => category.items.map((item) => [item.id, category])),
 );
+
+/**
+ * Identifiant d'une ligne de panier : « cu-nutella » pour le plat seul,
+ * « cu-nutella+x-caramel-liquide » quand un supplément est choisi. Deux
+ * versions du même plat sont deux lignes, comme en cuisine.
+ */
+export function lineId(itemId: string, extraId?: string | null): string {
+  return extraId ? `${itemId}+${extraId}` : itemId;
+}
+
+/** Retrouve plat, rubrique et supplément d'une ligne ; null si la carte a changé. */
+export function resolveLine(
+  id: string,
+): { item: MenuItem; category: MenuCategory; extra?: MenuExtra } | null {
+  const [itemId, extraId] = id.split("+");
+  const item = menuIndex[itemId];
+  const category = categoryOf[itemId];
+  if (!item || !category) return null;
+  if (extraId === undefined) return { item, category };
+  const extra = category.extras?.find((candidate) => candidate.id === extraId);
+  return extra ? { item, category, extra } : null;
+}
 
 /** « 15 pizzas », « 1 pizza » : l'unité est au pluriel dans les données. */
 export function countLabel(count: number, unit: string): string {

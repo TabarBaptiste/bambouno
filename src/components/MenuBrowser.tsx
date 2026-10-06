@@ -97,7 +97,12 @@ export function MenuBrowser() {
               ) : null}
               <ul className="mt-2 divide-y divide-hairline">
                 {category.items.map((item) => (
-                  <MenuItemCard key={item.id} item={item} visual={category.visual} />
+                  <MenuItemCard
+                    key={item.id}
+                    item={item}
+                    visual={category.visual}
+                    extras={category.extras}
+                  />
                 ))}
               </ul>
             </section>
