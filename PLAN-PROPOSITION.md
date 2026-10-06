@@ -9,15 +9,16 @@ Contexte : ils sont en Martinique, je suis en France hexagonale, tout se fait à
 
 **À faire**
 - [ ] Mettre le site en ligne sur une adresse provisoire.
-- [ ] Faire valider **chaque prix et chaque composition** (liste « À confirmer » du README). Un prix faux = perte de confiance immédiate.
-- [ ] Vérifier la gamme des boissons.
-- [ ] Ajouter un **suivi d'audience sans cookies** (Plausible, Umami ou outil gratuit de l'hébergeur) et un suivi des **clics sur « Commander sur WhatsApp »**. C'est ma preuve chiffrée plus tard.
-- [ ] Préparer un **QR code** qui pointe vers le site.
+- [ ] Mettre le site sur Netlify (adresse `.netlify.app`) avec `NEXT_PUBLIC_SITE_URL` et `NEXT_PUBLIC_UMAMI_WEBSITE_ID`. Tester une commande de bout en bout.
+- [ ] Faire valider **chaque prix et chaque composition** (liste « À confirmer » du README) et la **gamme des boissons**. Un prix faux = perte de confiance immédiate. Cette validation se fait **avec le restaurant, après le premier message** : dans le message, présenter le site comme une démo dont la carte est à confirmer ensemble, et passer la carte en revue au début de l'appel, avant de parler d'offre.
+- [x] Ajouter un **suivi d'audience sans cookies** et un suivi des **clics sur « Commander sur WhatsApp »**. Fait : Umami Cloud (offre Hobby, gratuite : 100 000 événements/mois, 1 site, 6 mois de données). Événements : `whatsapp-click` (commande envoyée) et `whatsapp-closed` (tentative hors horaires). Variable `NEXT_PUBLIC_UMAMI_WEBSITE_ID` à définir sur l'hébergeur. À présenter comme « demandes envoyées », pas « commandes confirmées » : les bloqueurs de pub sous-comptent un peu.
 - [ ] Faire une **vidéo d'écran de 30 à 60 secondes** : commande passée sur le site, puis message reçu sur WhatsApp.
 
-**Pourquoi** : à distance, je n'ai qu'une chance de faire bonne impression. Tout doit marcher avant le premier message.
+**Pas avant l'accord du restaurant** : le **domaine définitif** (IONOS ~1,20 €/an en promo, vérifier le renouvellement) et le **QR code**. Un QR code est imprimé, son adresse ne doit donc plus changer : il pointe vers le domaine, jamais vers `.netlify.app`. Le premier message part avec le lien `.netlify.app` et la vidéo, sans QR code.
 
-**Hébergement** : ne pas rester sur Vercel Hobby (usage commercial interdit). Prendre Netlify ou Cloudflare Pages (gratuit), ou Vercel Pro (~20 $/mois).
+**Pourquoi** : à distance, je n'ai qu'une chance de faire bonne impression. Le site et la vidéo doivent marcher avant le premier message.
+
+**Hébergement** : décidé, **Netlify**. Vercel Hobby est exclu : ses conditions réservent ce plan à un usage « personal or non-commercial ». Netlify Free autorise l'usage commercial (d'après leur forum, à relire dans leurs conditions). Attention aux **300 crédits/mois** : un déploiement coûte 15 crédits, et à épuisement tous les sites de l'équipe sont **mis en pause**. Pendant l'essai, regrouper les modifications avant de pousser. Passer à **Personal (9 $/mois, 1 000 crédits)** dès que le restaurant est client payant.
 
 ---
 
@@ -26,7 +27,7 @@ Contexte : ils sont en Martinique, je suis en France hexagonale, tout se fait à
 Numéro du restaurant : +596 696 44 41 22 (le même que pour les commandes).
 
 **Message court** (à adapter) :
-> Bonjour, je suis développeur web. J'ai créé gratuitement un site pour Bambouno Pizza : vos clients voient la carte, choisissent leurs pizzas, et la commande arrive directement sur ce WhatsApp, déjà écrite et rangée. Voici le lien, vous pouvez tester depuis votre téléphone : [lien]. Je peux vous montrer en 10 minutes par téléphone, quand ça vous arrange.
+> Bonjour, je suis développeur web. J'ai créé gratuitement un site pour Bambouno Pizza : vos clients voient la carte, choisissent leurs pizzas, et la commande arrive directement sur ce WhatsApp, déjà écrite et rangée. Voici le lien, vous pouvez tester depuis votre téléphone : [lien]. C'est une démo : les prix et les compositions sont à confirmer avec vous. Je peux vous montrer en 10 minutes par téléphone, quand ça vous arrange.
 
 **À joindre** : le lien + la vidéo d'écran.
 
@@ -39,7 +40,7 @@ Numéro du restaurant : +596 696 44 41 22 (le même que pour les commandes).
 
 ## Étape 2 : L'appel / la visio
 
-**Commencer par des questions**, pas par la démo :
+**Commencer par des questions**, pas par la démo (puis passer la carte en revue : prix, compositions, boissons) :
 - Combien d'appels et de messages un samedi soir ?
 - Des erreurs de commande ? Des clients qui n'arrivent pas à vous joindre ?
 - Comment les clients connaissent votre carte aujourd'hui ?
@@ -126,19 +127,26 @@ Si les chiffres sont faibles, regarder d'abord si le restaurant a fait sa part (
 
 ## Étape 7 : Phase 2, gestion autonome (après plusieurs mois)
 
-Seulement quand la phase 1 est adoptée. Besoin : changer prix, horaires et disponibilités sans passer par moi.
+Seulement quand la phase 1 est adoptée **et** que le besoin est prouvé.
+
+**D'abord, pas de développement : modifications par WhatsApp.** Le restaurant écrit « plus de pizza X ce soir » ou « la 4 fromages passe à 13 € », je modifie `src/data/menu.ts` et je pousse (environ 2 minutes). Inclus dans l'abonnement. Pas d'outil à apprendre pour eux, et ils n'ont pas forcément d'ordinateur. Attention aux crédits Netlify : un déploiement coûte 15 crédits, regrouper les modifications quand c'est possible.
+
+**Signal pour passer à la suite** : ils envoient des modifications toutes les semaines pendant l'essai. Sinon, ne rien construire.
+
+**Ensuite : page d'admin pensée pour le téléphone** (liste des plats, bouton « indisponible ce soir », champ prix), protégée par un compte unique pour le personnel.
 
 | Solution | Coût | Remarque |
 |---|---|---|
-| **Google Sheets** lu par le site | 0 € | Le plus simple pour eux, ils connaissent déjà |
-| **CMS** (Sanity, offre gratuite) | 0 € au départ | Interface prête, plus de travail pour moi |
-| **Supabase** + page admin | 0 € en gratuit, ~25 $/mois en Pro | Le plus souple, indispensable pour paiement et créneaux |
+| **Supabase Pro** + page admin | ~25 $/mois | Solution de référence : sauvegardes, pas de mise en pause, indispensable pour paiement et créneaux |
+| Supabase gratuit | 0 € | À éviter pour un client : pause après une semaine sans activité, pas de sauvegardes |
+| Base et stockage Netlify (plan Free) | 0 € | Pas encore évalué : à regarder à ce moment-là |
+| Google Sheets, CMS (Sanity) | 0 € | Écartés : pas adaptés à un restaurant sans ordinateur |
 
-Attention : la version gratuite de Supabase met le projet **en pause après une semaine sans activité**. Pour un client, prévoir le Pro.
-
+- L'authentification du personnel n'est pas un obstacle : un compte unique (e-mail + mot de passe ou lien magique) se configure en une heure.
+- Garder une **carte de secours** : si une modification est invalide (prix mal saisi), le site garde la dernière carte valide.
 - `src/data/menu.ts` est déjà plat et sérialisable : il peut être remplacé par un `fetch` sans toucher aux composants.
 - **Paiement en ligne** (Stripe, SumUp) : commission par transaction (~1,5 % + 0,25 €), sans abonnement.
-- **Tarif phase 2** : devis à part (environ 400 à 1 000 € selon l'option) et abonnement mensuel relevé si je paie un service (Supabase Pro).
+- **Tarif phase 2** : devis à part (environ 400 à 1 000 € selon l'option) et abonnement relevé à environ 40 €/mois pour couvrir Supabase Pro.
 
 ---
 
@@ -146,8 +154,9 @@ Attention : la version gratuite de Supabase met le projet **en pause après une 
 
 | Poste | Qui paie | Montant |
 |---|---|---|
-| Hébergement (Netlify / Cloudflare Pages) | Moi, inclus dans l'abonnement | 0 € |
-| Domaine | Moi, inclus dans l'abonnement | ~8 à 15 €/an |
+| Hébergement (Netlify) | Moi, inclus dans l'abonnement | 0 € pendant l'essai, puis 9 $/mois (Personal) |
+| Statistiques (Umami Hobby) | Moi | 0 € (Pro 20 $/mois si 2e restaurant) |
+| Domaine | Moi, inclus dans l'abonnement | ~1,20 € la 1re année chez IONOS, puis à vérifier |
 | Micro-entreprise | Moi | 0 € (cotisations sur le chiffre d'affaires) |
 | RC Pro | Moi | ~100 €/an |
 | Phase 2 : Supabase Pro | Moi, répercuté dans l'abonnement | ~25 $/mois |
@@ -156,11 +165,11 @@ Attention : la version gratuite de Supabase met le projet **en pause après une 
 
 ## Checklist résumée
 
-1. [ ] Prix validés, site en ligne, audience + clics WhatsApp, QR code, vidéo
-2. [ ] Message WhatsApp envoyé (une relance max)
-3. [ ] Appel : questions, puis démo en direct
+1. [ ] Site en ligne sur Netlify, vidéo d'écran (audience + clics WhatsApp : fait)
+2. [ ] Message WhatsApp envoyé avec le lien `.netlify.app` (une relance max)
+3. [ ] Appel : questions, revue de la carte (prix, boissons), puis démo en direct
 4. [ ] Offre : formule A, 2 mois d'essai, engagements du restaurant écrits
-5. [ ] Micro-entreprise, devis signé, mentions légales, domaine
+5. [ ] Après accord : micro-entreprise, devis signé, mentions légales, domaine, puis QR code
 6. [ ] Lancement : Google Business, QR code, post, phrase au téléphone
 7. [ ] Points toutes les 2 semaines avec les chiffres
 8. [ ] Bilan, devis, abonnement
