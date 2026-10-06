@@ -3,6 +3,10 @@ import { Anton, Barlow_Condensed, Inter } from "next/font/google";
 import { site } from "@/data/site";
 import "./globals.css";
 
+// Identifiant du site Umami : public par nature (visible dans la page). Sans
+// lui, aucun script n'est chargé, ce qui garde les statistiques propres.
+const umamiId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
 const anton = Anton({
   weight: "400",
   subsets: ["latin"],
@@ -76,6 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Aller au contenu
         </a>
         {children}
+        {umamiId ? (
+          <script defer src="https://cloud.umami.is/script.js" data-website-id={umamiId} />
+        ) : null}
       </body>
     </html>
   );

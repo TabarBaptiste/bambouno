@@ -169,6 +169,11 @@ production : elle sert au canonical, à l'aperçu Open Graph (image générée p
 WhatsApp), au `sitemap.xml` et au `robots.txt`. Sur Vercel, le domaine de
 production du projet est utilisé à défaut.
 
+Définir **`NEXT_PUBLIC_UMAMI_WEBSITE_ID`** pour activer les statistiques
+Umami (sans cookies). Événements suivis : `whatsapp-click` (commande envoyée
+sur WhatsApp) et `whatsapp-closed` (tentative hors horaires). Sans la
+variable, aucun script n'est chargé.
+
 ## Phase 2 (si la phase 1 convertit)
 
 Click & collect avec créneaux de retrait et paiement en ligne : **Supabase**
