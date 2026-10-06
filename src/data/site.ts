@@ -5,15 +5,11 @@
 
 /**
  * URL publique du site, pour les URL absolues (canonical, Open Graph,
- * sitemap). À définir en production via NEXT_PUBLIC_SITE_URL ; sur Vercel, on
- * retombe sur le domaine de production du projet.
+ * sitemap). À définir en production via NEXT_PUBLIC_SITE_URL (variable Netlify).
  */
 function resolveSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL;
   if (explicit) return explicit.replace(/\/$/, "");
-  // Variable exposée automatiquement par Vercel aux projets Next.js.
-  const vercel = process.env.NEXT_PUBLIC_VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return `https://${vercel}`;
   return "http://localhost:3000";
 }
 
