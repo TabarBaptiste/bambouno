@@ -23,7 +23,7 @@ export const site = {
   tagline: "Pizzas, crêpes & friands - cuits au feu, servis chaud.",
   creole: "Nou ka fè'y pou'w.",
   description:
-    "Pizzeria à emporter à Gros-Morne, Martinique. Pizzas base tomate ou crème, pizzas pêcheur, crêpes salées et sucrées, friands et boissons. Commande par téléphone ou WhatsApp, du lundi au samedi à partir de 17h30.",
+    "Pizzeria à emporter au Gros-Morne, Martinique. Pizzas base tomate ou crème, pizzas pêcheur, crêpes salées et sucrées, friands et boissons. Commande par téléphone ou WhatsApp, du lundi au samedi à partir de 17h30.",
 
   phone: "+596696444122",
   phoneDisplay: "0696 44 41 22",
@@ -42,9 +42,9 @@ export const site = {
 
   /** Fiche Google Maps de l'établissement (itinéraire, avis). */
   mapsUrl: "https://maps.app.goo.gl/yT42EQgx83vn9zfn6",
-  /** Plan intégré, centré sur les coordonnées relevées sur place. */
+  /** Plan intégré : lien « Partager > Intégrer une carte » de la fiche Google. */
   mapsEmbedUrl:
-    "https://www.google.com/maps?q=14.7126174,-61.0019799&z=16&hl=fr&output=embed",
+    "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3150.5115674385875!2d-61.004601425970606!3d14.712602474326848!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c6aa368cf49d925%3A0x69f733fe0cc50d8b!2sBambouno%20pizza!5e1!3m2!1sfr!2sfr!4v1791299170196!5m2!1sfr!2sfr",
 
   /** Service : vente à emporter uniquement (pas de salle, pas de réservation). */
   serviceType: "Vente à emporter",

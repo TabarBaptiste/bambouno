@@ -6,6 +6,7 @@ import {
   cleanName,
   MAX_NAME_LENGTH,
   orderName,
+  sanitize,
   whatsappUrl,
 } from "@/lib/order";
 import { menuIndex } from "@/data/menu";
@@ -86,5 +87,29 @@ describe("message WhatsApp", () => {
     const url = new URL(whatsappUrl(lines, "Léa"));
     expect(url.origin + url.pathname).toBe(`https://wa.me/${site.whatsapp}`);
     expect(url.searchParams.get("text")).toBe(buildOrderMessage(lines, "Léa"));
+  });
+});
+
+describe("suppléments des crêpes sucrées", () => {
+  const caramel = "cu-nutella+x-caramel-liquide";
+
+  it("ajoute le supplément au nom et au prix de la ligne", () => {
+    expect(orderName(caramel)).toBe("Crêpe sucrée Nutella, supplément caramel liquide");
+    expect(cartTotal([{ id: caramel, quantity: 2 }])).toBeCloseTo((4 + 0.5) * 2);
+  });
+
+  it("garde le plat seul et sa version avec supplément sur deux lignes", () => {
+    const message = buildOrderMessage([
+      { id: caramel, quantity: 1 },
+      { id: "cu-nutella", quantity: 2 },
+    ]);
+    expect(message).toContain(
+      "• 2 × Crêpe sucrée Nutella\n• 1 × Crêpe sucrée Nutella, supplément caramel liquide",
+    );
+  });
+
+  it("refuse un supplément inconnu ou sur une rubrique qui n'en propose pas", () => {
+    expect(sanitize([{ id: "cu-nutella+x-inconnu", quantity: 1 }])).toEqual([]);
+    expect(sanitize([{ id: "p-4-fromages+x-caramel-liquide", quantity: 1 }])).toEqual([]);
   });
 });

@@ -8,11 +8,12 @@ import {
   useMemo,
   useState,
 } from "react";
-import { formatPrice, menuIndex } from "@/data/menu";
+import { formatPrice, resolveLine } from "@/data/menu";
 import {
   cartCount,
   cartTotal,
   MAX_NAME_LENGTH,
+  orderName,
   sanitize,
   type CartLine,
 } from "@/lib/order";
@@ -78,7 +79,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   }, [lines, name, loaded]);
 
   const add = useCallback((id: string) => {
-    if (!menuIndex[id]) return;
+    if (!resolveLine(id)) return;
     setLines((current) => {
       const existing = current.find((line) => line.id === id);
       if (!existing) return [...current, { id, quantity: 1 }];
@@ -108,7 +109,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const announcement = useMemo(() => {
     if (!lastAction) return "";
     if (lastAction.kind === "clear") return "Sélection vidée.";
-    const name = menuIndex[lastAction.id]?.name ?? "Article";
+    const name = orderName(lastAction.id) || "Article";
     const verb = lastAction.kind === "add" ? "ajouté" : "retiré";
     return `${name} ${verb}. ${describeCart(lines)}`;
   }, [lastAction, lines]);
