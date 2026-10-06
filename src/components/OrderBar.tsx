@@ -7,6 +7,7 @@ import { useOpenState } from "@/components/useOpenState";
 import { NewTabHint } from "@/components/NewTabHint";
 import { cleanName, MAX_NAME_LENGTH, orderName, sortByMenu, whatsappUrl } from "@/lib/order";
 import { WhatsAppIcon } from "@/components/icons";
+import { track } from "@/lib/analytics";
 
 /** Quand plus rien ne peut garder le focus (panier vidé), il revient à la carte. */
 function focusMenu() {
@@ -124,12 +125,17 @@ function CartPanel({ onClose }: { onClose: () => void }) {
 
   const order = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!canOrder) return;
+    if (!canOrder) {
+      // Demande manquée : le client voulait commander, le restaurant est fermé.
+      if (closed) track("whatsapp-closed", { articles: count });
+      return;
+    }
     if (!cleanName(name)) {
       setError(true);
       nameInput.current?.focus();
       return;
     }
+    track("whatsapp-click", { articles: count });
     const url = whatsappUrl(lines, name);
     const opened = window.open(url, "_blank");
     if (opened) opened.opener = null;
