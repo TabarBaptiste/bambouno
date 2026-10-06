@@ -21,7 +21,7 @@ export function Hero() {
         >
           <span className="text-white">Pizzas & crêpes</span>
           <br />
-          <span className="text-red">à Gros-Morne</span>
+          <span className="text-red">au Gros-Morne</span>
         </h1>
       </div>
     </section>
