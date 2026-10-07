@@ -9,7 +9,7 @@ export function Footer() {
           <span className="text-red">no</span>
         </p>
         <p className="mt-2 max-w-md text-sm text-muted">
-          <span lang="gcf">{site.creole}</span> Pizzeria à emporter,{" "}
+          Pizzeria à emporter,{" "}
           {site.address.city} - {site.address.region}.
         </p>
         <p className="mt-2 text-sm">
@@ -21,7 +21,7 @@ export function Footer() {
           </a>
         </p>
         <p className="mt-6 text-xs text-muted">
-          Prix en euros, susceptibles d&apos;évoluer. Les allergènes sont communiqués
+          Les allergènes sont communiqués
           sur demande à la commande.
         </p>
       </div>

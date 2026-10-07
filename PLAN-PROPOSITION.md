@@ -8,8 +8,8 @@ Contexte : ils sont en Martinique, je suis en France hexagonale, tout se fait à
 ## Étape 0 : Préparer le terrain (avant tout contact)
 
 **À faire**
-- [ ] Mettre le site en ligne sur une adresse provisoire.
-- [ ] Mettre le site sur Netlify (adresse `.netlify.app`) avec `NEXT_PUBLIC_SITE_URL` et `NEXT_PUBLIC_UMAMI_WEBSITE_ID`. Tester une commande de bout en bout.
+- [x] Mettre le site en ligne sur une adresse provisoire.
+- [x] Mettre le site sur Netlify (adresse `.netlify.app`) avec `NEXT_PUBLIC_SITE_URL` et `NEXT_PUBLIC_UMAMI_WEBSITE_ID`. Tester une commande de bout en bout.
 - [ ] Faire valider **chaque prix et chaque composition** (liste « À confirmer » du README) et la **gamme des boissons**. Un prix faux = perte de confiance immédiate. Cette validation se fait **avec le restaurant, après le premier message** : dans le message, présenter le site comme une démo dont la carte est à confirmer ensemble, et passer la carte en revue au début de l'appel, avant de parler d'offre.
 - [x] Ajouter un **suivi d'audience sans cookies** et un suivi des **clics sur « Commander sur WhatsApp »**. Fait : Umami Cloud (offre Hobby, gratuite : 100 000 événements/mois, 1 site, 6 mois de données). Événements : `whatsapp-click` (commande envoyée) et `whatsapp-closed` (tentative hors horaires). Variable `NEXT_PUBLIC_UMAMI_WEBSITE_ID` à définir sur l'hébergeur. À présenter comme « demandes envoyées », pas « commandes confirmées » : les bloqueurs de pub sous-comptent un peu.
 - [ ] Faire une **vidéo d'écran de 30 à 60 secondes** : commande passée sur le site, puis message reçu sur WhatsApp.
