@@ -86,6 +86,12 @@ Sans cela l'essai ne prouve rien et finira à tort par « ça ne marche pas » :
 ## Étape 4 : Cadre administratif (avant toute facture)
 
 - [ ] **Créer ma micro-entreprise** (gratuit : formalites.entreprise.gouv.fr). Sans statut, pas de facture légale.
+- [ ] **France Travail, avant de créer le statut** (appeler le 3949 ou écrire via l'espace personnel, et garder une trace écrite). Questions à poser :
+  - Dans ma situation (date de fin de contrat, droits restants), vaut-il mieux **cumuler ARE et revenus** ou demander l'**ARCE** ?
+  - Cumul : complément d'ARE = ARE mensuelle − 70 % des revenus déclarés ; pour une fin de contrat depuis le 1er avril 2025, plafond de **60 % des droits restants**. Quel est mon chiffre à moi ? Demander une simulation.
+  - Comment déclarer chaque mois (actualisation, même à 0 € de chiffre d'affaires) et quels justificatifs fournir ?
+  - Déclarer l'activité **dès la création du statut**, même sans facture. Ne pas facturer avant d'avoir la réponse.
+- [ ] **Si je trouve un CDI plus tard** : le cumul avec une micro-entreprise est légal, mais relire le contrat (clause d'exclusivité, non-concurrence), ne pas concurrencer l'employeur, ne pas utiliser son temps ni son matériel. Un CDI de développeur web peut entrer en concurrence avec cette activité : en parler à l'employeur avant de signer.
 - [ ] **Devis signé par email** avant de commencer : ce qui est inclus, ce qui ne l'est pas, prix, durée de l'essai.
 - [ ] **Domaine au nom du restaurant** (ou règle écrite sur ce qu'il devient si on arrête). Ça les rassure beaucoup.
 - [ ] **Page de mentions légales** sur le site (éditeur = le restaurant, hébergeur, contact).
@@ -169,7 +175,7 @@ Seulement quand la phase 1 est adoptée **et** que le besoin est prouvé.
 2. [ ] Message WhatsApp envoyé avec le lien `.netlify.app` (une relance max)
 3. [ ] Appel : questions, revue de la carte (prix, boissons), puis démo en direct
 4. [ ] Offre : formule A, 2 mois d'essai, engagements du restaurant écrits
-5. [ ] Après accord : micro-entreprise, devis signé, mentions légales, domaine, puis QR code
+5. [ ] Après accord : appel France Travail, micro-entreprise, devis signé, mentions légales, domaine, puis QR code
 6. [ ] Lancement : Google Business, QR code, post, phrase au téléphone
 7. [ ] Points toutes les 2 semaines avec les chiffres
 8. [ ] Bilan, devis, abonnement
