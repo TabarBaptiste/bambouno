@@ -52,9 +52,9 @@ export type MenuCategory = {
   unit: string;
   visual: DishVisual;
   /**
-   * Ce qu'est le plat, en tête de sa ligne dans le message WhatsApp et le
-   * panier (« Pizza sucrée À la banane »). Sans ça, « À la banane » ne dit rien
-   * à quelqu'un qui découvre la carte. Vide quand le nom suffit (boissons).
+   * Ce qu'est le plat, en tête de sa ligne dans le panier (« Pizza sucrée À
+   * la banane »). Sans ça, « À la banane » ne dit rien à quelqu'un qui
+   * découvre la carte. Vide quand le nom suffit (boissons).
    */
   orderLabel?: string;
   /** Précision utile uniquement (supplément, commande à l'avance, loi). */

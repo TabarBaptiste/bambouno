@@ -19,12 +19,10 @@ export const site = {
   tagline: "Pizzas, crêpes & friands - cuits au feu, servis chaud.",
   // creole: "Nou ka fè'y pou'w.",
   description:
-    "Pizzeria à emporter au Gros-Morne. Pizzas base tomate ou crème, pizzas pêcheur, crêpes salées et sucrées, friands et boissons. Commande par téléphone ou WhatsApp, du lundi au samedi à partir de 17h30.",
+    "Pizzeria à emporter au Gros-Morne. Pizzas base tomate ou crème, pizzas pêcheur, crêpes salées et sucrées, friands et boissons. Commande par téléphone, du lundi au samedi à partir de 17h30.",
 
   phone: "+596696444122",
   phoneDisplay: "0696 44 41 22",
-  // Le numéro WhatsApp est au format international sans espace ni "+".
-  whatsapp: "596696444122",
 
   address: {
     street: "Route nationale",

@@ -1,11 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { fixerHeure, MARTINIQUE } from "./horloge";
 
-test.beforeEach(async ({ context, page }) => {
-  // Pas de vraie sortie vers WhatsApp pendant les tests.
-  await context.route("https://wa.me/**", (route) =>
-    route.fulfill({ contentType: "text/html", body: "<title>WhatsApp</title>" }),
-  );
+test.beforeEach(async ({ page }) => {
   // Ouvert par défaut : les parcours de commande ne dépendent pas de l'heure réelle.
   await fixerHeure(page, MARTINIQUE.ouvert);
 });
@@ -27,7 +23,7 @@ test("le bouton d'appel a un nom accessible, même en icône seule", async ({ pa
   ).toBeVisible();
 });
 
-test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async ({ page }) => {
+test("composer une commande au clavier, jusqu'au bouton d'appel", async ({ page }) => {
   await page.goto("/");
 
   const add = page.getByRole("button", { name: "Ajouter 4 Fromages" });
@@ -42,7 +38,7 @@ test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async 
     /2 articles/,
   );
 
-  // Rien ne part vers WhatsApp sans passer par le panier.
+  // Aucun appel ne se lance sans passer par le panier.
   const openCart = page.getByRole("button", { name: /Voir le panier/ });
   await expect(openCart).toContainText("2 articles");
   await openCart.click();
@@ -54,22 +50,12 @@ test("composer une commande au clavier, avec prénom, jusqu'à WhatsApp", async 
   await cart.getByRole("button", { name: "Retirer Pizza 4 Fromages" }).click();
   await expect(cart.getByText("Quantité : 1")).toBeAttached();
 
-  // Le prénom est obligatoire.
-  const submit = cart.getByRole("button", { name: /Commander sur WhatsApp/ });
-  await submit.click();
-  const firstName = cart.getByRole("textbox", { name: "Votre prénom" });
-  await expect(firstName).toBeFocused();
-  await expect(firstName).toHaveAttribute("aria-invalid", "true");
-
-  await firstName.fill("Léa");
-  const popupPromise = page.waitForEvent("popup");
-  await submit.click();
-  const popup = await popupPromise;
-  const text = new URL(popup.url()).searchParams.get("text");
-  expect(text).toContain("c'est Léa");
-  expect(text).toContain("1 × Pizza 4 Fromages");
-  expect(text).not.toContain("€");
-  await expect(cart).toBeHidden();
+  // Le restaurant prend les commandes par téléphone : le bouton lance l'appel.
+  const call = cart.getByRole("link", { name: /Appeler pour commander/ });
+  await expect(call).toHaveAttribute("href", "tel:+596696444122");
+  await expect(call).toHaveAccessibleName(/0696 44 41 22/);
+  await expect(cart.getByText("Quantité : 1")).toBeAttached();
+  await expect(cart.getByRole("textbox")).toHaveCount(0);
 });
 
 test("Échap ferme le panier et rend le focus au bouton", async ({ page }) => {
@@ -92,38 +78,30 @@ test("retirer la dernière unité rend le focus au bouton d'ajout", async ({ pag
   await expect(page.locator("#order-bar")).toBeHidden();
 });
 
-test("le panier et le prénom survivent au rechargement", async ({ page }) => {
+test("le panier survit au rechargement", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Ajouter Coca-Cola 50 cl" }).click();
-  await page.getByRole("button", { name: /Voir le panier/ }).click();
-  await page.getByRole("textbox", { name: "Votre prénom" }).fill("Marc");
   await page.reload();
 
   const openCart = page.getByRole("button", { name: /Voir le panier/ });
   await expect(openCart).toContainText("1 article");
-  await openCart.click();
-  await expect(page.getByRole("textbox", { name: "Votre prénom" })).toHaveValue("Marc");
 });
 
-test("le message WhatsApp dit ce qu'est chaque plat, à plat, sans prix", async ({ page }) => {
+test("le panier dit ce qu'est chaque plat, à plat, dans l'ordre de la carte", async ({ page }) => {
   await page.goto("/");
   for (const name of ["Ajouter Exotique", "Ajouter À la banane", "Ajouter Crevettes à la crème"]) {
     await page.getByRole("button", { name }).click();
   }
   await page.getByRole("button", { name: /Voir le panier/ }).click();
   const cart = page.getByRole("dialog", { name: "Votre panier" });
-  // Le panier montre ce qui sera envoyé.
   await expect(cart).toContainText("Pizza sucrée À la banane");
   await expect(cart).toContainText("Pizza pêcheur Crevettes à la crème");
-
-  await cart.getByRole("textbox", { name: "Votre prénom" }).fill("Léa");
-  const popupPromise = page.waitForEvent("popup");
-  await cart.getByRole("button", { name: /Commander sur WhatsApp/ }).click();
-  const text = new URL((await popupPromise).url()).searchParams.get("text");
-  expect(text).toContain(
-    "• 1 × Pizza Exotique\n• 1 × Pizza pêcheur Crevettes à la crème\n• 1 × Pizza sucrée À la banane",
-  );
-  expect(text).not.toMatch(/€|total/i);
+  const names = await cart.locator("li p:first-child").allTextContents();
+  expect(names).toEqual([
+    "Pizza Exotique",
+    "Pizza pêcheur Crevettes à la crème",
+    "Pizza sucrée À la banane",
+  ]);
 });
 
 async function search(page: import("@playwright/test").Page, text: string) {
@@ -304,46 +282,28 @@ test.describe("hors des horaires d'ouverture", () => {
     return page.getByRole("dialog", { name: "Votre panier" });
   }
 
-  test("le panier reste utilisable mais la commande WhatsApp est désactivée", async ({ page }) => {
+  test("le panier reste utilisable mais l'appel est désactivé", async ({ page }) => {
     await fixerHeure(page, MARTINIQUE.ferme);
     const cart = await ouvrirLePanier(page);
 
-    // Tout le reste fonctionne : quantités, prénom, vider le panier.
+    // Tout le reste fonctionne : quantités, vider le panier.
     await cart.getByRole("button", { name: "Ajouter Pizza 4 Fromages" }).click();
     await expect(cart.getByText("Quantité : 2")).toBeAttached();
-    await cart.getByRole("textbox", { name: "Votre prénom" }).fill("Léa");
 
-    const submit = cart.getByRole("button", { name: /Commander sur WhatsApp/ });
-    await expect(submit).toHaveAttribute("aria-disabled", "true");
-    await expect(submit).toBeVisible();
-    // Ni lien de sortie annoncé, ni explication manquante.
-    await expect(submit).not.toContainText("nouvel onglet");
+    const call = cart.getByRole("button", { name: /Appeler pour commander/ });
+    await expect(call).toHaveAttribute("aria-disabled", "true");
+    await expect(call).toBeVisible();
+    // Pas de lien d'appel, et l'explication est lue avec le bouton.
+    await expect(cart.getByRole("link", { name: /Appeler pour commander/ })).toHaveCount(0);
     await expect(cart.getByRole("status")).toContainText("Fermé • Ouvre à 17h30");
-    await expect(submit).toHaveAccessibleDescription(/Fermé • Ouvre à 17h30/);
-  });
-
-  test("ni le clic ni Entrée n'ouvrent WhatsApp", async ({ page }) => {
-    await fixerHeure(page, MARTINIQUE.ferme);
-    const cart = await ouvrirLePanier(page);
-    await cart.getByRole("textbox", { name: "Votre prénom" }).fill("Léa");
-
-    let ouvertures = 0;
-    page.on("popup", () => (ouvertures += 1));
-    await cart.getByRole("button", { name: /Commander sur WhatsApp/ }).click({ force: true });
-    await page.getByRole("textbox", { name: "Votre prénom" }).press("Enter");
-    await page.waitForTimeout(500);
-
-    expect(ouvertures).toBe(0);
-    await expect(cart).toBeVisible();
-    // Pas de faux message d'erreur de prénom non plus : le prénom est rempli, et la fermeture prime.
-    await expect(cart.getByText("Indiquez votre prénom")).toHaveCount(0);
+    await expect(call).toHaveAccessibleDescription(/Fermé • Ouvre à 17h30/);
   });
 
   test("le dimanche, le message annonce le lundi", async ({ page }) => {
     await fixerHeure(page, MARTINIQUE.dimanche);
     const cart = await ouvrirLePanier(page);
     await expect(cart.getByRole("status")).toContainText("Fermé • Ouvre lundi à 17h30");
-    await expect(cart.getByRole("button", { name: /Commander sur WhatsApp/ })).toHaveAttribute(
+    await expect(cart.getByRole("button", { name: /Appeler pour commander/ })).toHaveAttribute(
       "aria-disabled",
       "true",
     );
@@ -352,25 +312,24 @@ test.describe("hors des horaires d'ouverture", () => {
   test("dans la dernière heure, on peut encore commander", async ({ page }) => {
     await fixerHeure(page, MARTINIQUE.bientotFerme);
     const cart = await ouvrirLePanier(page);
-    await expect(cart.getByRole("button", { name: /Commander sur WhatsApp/ })).not.toHaveAttribute(
-      "aria-disabled",
-      "true",
-    );
+    await expect(cart.getByRole("link", { name: /Appeler pour commander/ })).toBeVisible();
     await expect(cart.getByRole("status")).toBeEmpty();
   });
 
-  test("le bouton se désactive quand la fermeture tombe pendant que le panier est ouvert", async ({ page }) => {
+  test("l'appel se désactive quand la fermeture tombe pendant que le panier est ouvert", async ({ page }) => {
     await page.clock.install({ time: new Date("2026-09-29T21:59:30-04:00") });
     await page.goto("/");
     await page.getByRole("button", { name: "Ajouter 4 Fromages" }).click();
     await page.getByRole("button", { name: /Voir le panier/ }).click();
     const cart = page.getByRole("dialog", { name: "Votre panier" });
-    const submit = cart.getByRole("button", { name: /Commander sur WhatsApp/ });
-    await expect(submit).not.toHaveAttribute("aria-disabled", "true");
+    await expect(cart.getByRole("link", { name: /Appeler pour commander/ })).toBeVisible();
 
     // 22h00 passées : la minuterie d'une minute recalcule le statut.
     await page.clock.runFor(61_000);
-    await expect(submit).toHaveAttribute("aria-disabled", "true");
+    await expect(cart.getByRole("button", { name: /Appeler pour commander/ })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
     await expect(cart.getByRole("status")).toContainText("Fermé");
   });
 });

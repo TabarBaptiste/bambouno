@@ -1,16 +1,6 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildOrderMessage,
-  cartCount,
-  cartTotal,
-  cleanName,
-  MAX_NAME_LENGTH,
-  orderName,
-  sanitize,
-  whatsappUrl,
-} from "@/lib/order";
+import { cartCount, cartTotal, orderName, sanitize, sortByMenu } from "@/lib/order";
 import { menuIndex } from "@/data/menu";
-import { site } from "@/data/site";
 
 const pizza = menuIndex["p-4-fromages"];
 const drink = menuIndex["b-coca"];
@@ -47,46 +37,15 @@ describe("orderName", () => {
   });
 });
 
-describe("message WhatsApp", () => {
+describe("sortByMenu", () => {
   it("range les plats dans l'ordre de la carte, pas dans l'ordre des ajouts", () => {
-    const message = buildOrderMessage([
+    const ids = sortByMenu([
       { id: "b-coca", quantity: 1 },
       { id: "p-4-fromages", quantity: 1 },
       { id: "f-gros-mornaise", quantity: 1 },
       { id: "p-exotique", quantity: 1 },
-    ]);
-    expect(message).toContain(
-      "• 1 × Pizza 4 Fromages\n• 1 × Pizza Exotique\n• 1 × Friand La Gros-Mornaise\n• 1 × Coca-Cola 50 cl",
-    );
-  });
-
-  it("propose un message simple quand le panier est vide", () => {
-    expect(buildOrderMessage([])).toBe(`Bonjour ${site.name}\n\nJe voudrais passer une commande.`);
-  });
-
-  it("se présente avec le prénom, nettoyé", () => {
-    const message = buildOrderMessage([{ id: pizza.id, quantity: 1 }], "  Marie   Lou ");
-    expect(message.split("\n")[0]).toBe(`Bonjour ${site.name}, c'est Marie Lou`);
-  });
-
-  it("borne la longueur du prénom", () => {
-    expect(cleanName("a".repeat(100))).toHaveLength(MAX_NAME_LENGTH);
-  });
-
-  it("liste les plats, sans aucun prix", () => {
-    const message = buildOrderMessage([
-      { id: pizza.id, quantity: 2 },
-      { id: drink.id, quantity: 1 },
-    ]);
-    expect(message).toContain(`• 2 × Pizza ${pizza.name}\n• 1 × ${drink.name}`);
-    expect(message).not.toMatch(/€|total/i);
-  });
-
-  it("encode le message dans l'URL wa.me", () => {
-    const lines = [{ id: pizza.id, quantity: 1 }];
-    const url = new URL(whatsappUrl(lines, "Léa"));
-    expect(url.origin + url.pathname).toBe(`https://wa.me/${site.whatsapp}`);
-    expect(url.searchParams.get("text")).toBe(buildOrderMessage(lines, "Léa"));
+    ]).map((line) => line.id);
+    expect(ids).toEqual(["p-4-fromages", "p-exotique", "f-gros-mornaise", "b-coca"]);
   });
 });
 
@@ -98,14 +57,12 @@ describe("suppléments des crêpes sucrées", () => {
     expect(cartTotal([{ id: caramel, quantity: 2 }])).toBeCloseTo((4 + 0.5) * 2);
   });
 
-  it("garde le plat seul et sa version avec supplément sur deux lignes", () => {
-    const message = buildOrderMessage([
+  it("garde le plat seul avant sa version avec supplément", () => {
+    const ids = sortByMenu([
       { id: caramel, quantity: 1 },
       { id: "cu-nutella", quantity: 2 },
-    ]);
-    expect(message).toContain(
-      "• 2 × Crêpe sucrée Nutella\n• 1 × Crêpe sucrée Nutella, supplément caramel liquide",
-    );
+    ]).map((line) => line.id);
+    expect(ids).toEqual(["cu-nutella", caramel]);
   });
 
   it("refuse un supplément inconnu ou sur une rubrique qui n'en propose pas", () => {

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { formatPrice, resolveLine } from "@/data/menu";
 import { useOrder } from "@/components/OrderProvider";
 import { useOpenState } from "@/components/useOpenState";
-import { NewTabHint } from "@/components/NewTabHint";
-import { cleanName, MAX_NAME_LENGTH, orderName, sortByMenu, whatsappUrl } from "@/lib/order";
-import { WhatsAppIcon } from "@/components/icons";
+import { orderName, sortByMenu } from "@/lib/order";
+import { PhoneIcon } from "@/components/icons";
+import { site } from "@/data/site";
 import { track } from "@/lib/analytics";
 
 /** Quand plus rien ne peut garder le focus (panier vidé), il revient à la carte. */
@@ -15,9 +15,10 @@ function focusMenu() {
 }
 
 /**
- * Barre basse « Voir le panier », puis panneau du panier. Commander se fait
- * en deux temps volontairement : on vérifie sa sélection et on donne son
- * prénom avant d'ouvrir WhatsApp, jamais par un clic accidentel.
+ * Barre basse « Voir le panier », puis panneau du panier. Le restaurant prend
+ * ses commandes par téléphone, pas par message : le panier sert à préparer la
+ * commande, que le client lit ensuite à voix haute. L'appel se lance depuis le
+ * panneau, jamais depuis la barre, pour ne pas appeler par un clic accidentel.
  *
  * Le panneau est un <dialog> natif ouvert en modal : piège du focus, touche
  * Échap et fond inerte sont gérés par le navigateur.
@@ -102,17 +103,13 @@ export function OrderBar() {
 }
 
 function CartPanel({ onClose }: { onClose: () => void }) {
-  const { lines, count, total, add, remove, clear, name, setName } = useOrder();
-  const [error, setError] = useState(false);
+  const { lines, count, total, add, remove, clear } = useOrder();
   const heading = useRef<HTMLHeadingElement>(null);
-  const nameInput = useRef<HTMLInputElement>(null);
-  const nameId = useId();
-  const errorId = useId();
   const closedId = useId();
 
-  // Hors horaires, tout fonctionne sauf l'envoi sur WhatsApp : personne ne
-  // lirait le message avant l'ouverture. Tant que le statut n'est pas calculé
-  // (`null`), on n'ouvre pas la porte non plus.
+  // Hors horaires, tout fonctionne sauf l'appel : personne ne décrocherait.
+  // Tant que le statut n'est pas calculé (`null`), on n'ouvre pas la porte non
+  // plus.
   const openState = useOpenState();
   const canOrder = openState?.isOpen === true;
   const closed = openState !== null && !openState.isOpen;
@@ -121,27 +118,6 @@ function CartPanel({ onClose }: { onClose: () => void }) {
     remove(id);
     // La ligne disparaît avec sa dernière unité : le focus revient au titre.
     if (quantity === 1) heading.current?.focus();
-  };
-
-  const order = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!canOrder) {
-      // Demande manquée : le client voulait commander, le restaurant est fermé.
-      if (closed) track("whatsapp-closed", { articles: count });
-      return;
-    }
-    if (!cleanName(name)) {
-      setError(true);
-      nameInput.current?.focus();
-      return;
-    }
-    track("whatsapp-click", { articles: count });
-    const url = whatsappUrl(lines, name);
-    const opened = window.open(url, "_blank");
-    if (opened) opened.opener = null;
-    // Fenêtre bloquée (certains navigateurs intégrés) : on part dans l'onglet.
-    else window.location.href = url;
-    onClose();
   };
 
   return (
@@ -230,58 +206,45 @@ function CartPanel({ onClose }: { onClose: () => void }) {
             </p>
           </div>
 
-          <form onSubmit={order} noValidate className="mt-6">
-            <label htmlFor={nameId} className="block font-heading text-base font-semibold uppercase">
-              Votre prénom
-            </label>
-            <input
-              ref={nameInput}
-              id={nameId}
-              type="text"
-              value={name}
-              onChange={(event) => {
-                setName(event.target.value);
-                if (error) setError(false);
-              }}
-              autoComplete="given-name"
-              autoCapitalize="words"
-              enterKeyHint="send"
-              maxLength={MAX_NAME_LENGTH}
-              required
-              aria-invalid={error || undefined}
-              aria-describedby={error ? errorId : undefined}
-              className="mt-2 w-full rounded-full border border-control bg-surface px-4 py-3 text-base text-white aria-invalid:border-red-text"
-            />
-            {error ? (
-              <p id={errorId} className="mt-2 text-sm text-red-text">
-                Indiquez votre prénom : on vous appelle avec au moment du retrait.
-              </p>
-            ) : null}
+          <p className="mt-6 text-sm text-muted">
+            Appelez et lisez cette liste au restaurant : le haut-parleur vous permet de
+            la garder sous les yeux.
+          </p>
 
-            {/* Région live toujours présente : l'annonce suit un passage à « fermé » pendant que le panier est ouvert. */}
-            <p id={closedId} role="status" className={closed ? "mt-5 text-sm text-white" : "sr-only"}>
-              {closed ? <strong className="font-semibold">{openState.label}</strong> : null}
-            </p>
+          {/* Région live toujours présente : l'annonce suit un passage à « fermé » pendant que le panier est ouvert. */}
+          <p id={closedId} role="status" className={closed ? "mt-5 text-sm text-white" : "sr-only"}>
+            {closed ? <strong className="font-semibold">{openState.label}</strong> : null}
+          </p>
 
-            {/*
+          {canOrder ? (
+            <a
+              href={`tel:${site.phone}`}
+              onClick={() => track("call-click", { articles: count })}
+              className="btn-primary mt-5 w-full text-base"
+            >
+              <PhoneIcon className="size-5" />
+              Appeler pour commander
+              <span className="sr-only"> le {site.phoneDisplay}</span>
+            </a>
+          ) : (
+            /*
               aria-disabled et non disabled : le bouton reste atteignable au
               clavier et au lecteur d'écran, qui lit pourquoi il est inactif.
-            */}
+            */
             <button
-              type="submit"
-              aria-disabled={!canOrder || undefined}
+              type="button"
+              aria-disabled="true"
               aria-describedby={closed ? closedId : undefined}
-              className={
-                canOrder
-                  ? "btn-primary mt-5 w-full text-base"
-                  : "mt-5 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-control bg-surface-raised px-6 py-3.5 font-heading text-base font-semibold uppercase tracking-wide text-muted"
-              }
+              onClick={() => {
+                // Demande manquée : le client voulait commander, le restaurant est fermé.
+                if (closed) track("call-closed", { articles: count });
+              }}
+              className="mt-5 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-full border border-control bg-surface-raised px-6 py-3.5 font-heading text-base font-semibold uppercase tracking-wide text-muted"
             >
-              <WhatsAppIcon className="size-5" />
-              Commander sur WhatsApp
-              {canOrder ? <NewTabHint /> : null}
+              <PhoneIcon className="size-5" />
+              Appeler pour commander
             </button>
-          </form>
+          )}
         </>
       )}
     </div>

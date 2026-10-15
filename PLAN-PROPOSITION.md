@@ -3,6 +3,8 @@
 Objectif : que le restaurant utilise et paie ma solution.
 Contexte : ils sont en Martinique, je suis en France hexagonale, tout se fait à distance.
 
+> **Mise à jour après leur réponse automatique** : « Nous ne prenons pas de commande par WhatsApp. Appelez-nous ! » Le restaurant travaille **par téléphone**. Le site ne remplace donc plus le téléphone : il **prépare la commande** (carte à jour, panier, liste claire) que le client **lit au téléphone**. Le bouton « Commander sur WhatsApp » est devenu « Appeler pour commander ». Conséquences : le pitch est plus modeste (appel plus court, moins d'erreurs), je ne vois plus les commandes (seulement les clics sur « Appeler »), et ce message était peut-être **automatique** : personne n'a forcément lu mon message ni vu le lien.
+
 ---
 
 ## Étape 0 : Préparer le terrain (avant tout contact)
@@ -11,8 +13,8 @@ Contexte : ils sont en Martinique, je suis en France hexagonale, tout se fait à
 - [x] Mettre le site en ligne sur une adresse provisoire.
 - [x] Mettre le site sur Netlify (adresse `.netlify.app`) avec `NEXT_PUBLIC_SITE_URL` et `NEXT_PUBLIC_UMAMI_WEBSITE_ID`. Tester une commande de bout en bout.
 - [ ] Faire valider **chaque prix et chaque composition** (liste « À confirmer » du README) et la **gamme des boissons**. Un prix faux = perte de confiance immédiate. Cette validation se fait **avec le restaurant, après le premier message** : dans le message, présenter le site comme une démo dont la carte est à confirmer ensemble, et passer la carte en revue au début de l'appel, avant de parler d'offre.
-- [x] Ajouter un **suivi d'audience sans cookies** et un suivi des **clics sur « Commander sur WhatsApp »**. Fait : Umami Cloud (offre Hobby, gratuite : 100 000 événements/mois, 1 site, 6 mois de données). Événements : `whatsapp-click` (commande envoyée) et `whatsapp-closed` (tentative hors horaires). Variable `NEXT_PUBLIC_UMAMI_WEBSITE_ID` à définir sur l'hébergeur. À présenter comme « demandes envoyées », pas « commandes confirmées » : les bloqueurs de pub sous-comptent un peu.
-- [ ] Faire une **vidéo d'écran de 30 à 60 secondes** : commande passée sur le site, puis message reçu sur WhatsApp.
+- [x] Ajouter un **suivi d'audience sans cookies** et un suivi des **clics sur « Appeler pour commander »**. Fait : Umami Cloud (offre Hobby, gratuite : 100 000 événements/mois, 1 site, 6 mois de données). Événements : `call-click` (appel lancé depuis le panier) et `call-closed` (tentative hors horaires). Variable `NEXT_PUBLIC_UMAMI_WEBSITE_ID` à définir sur l'hébergeur. À présenter comme « appels lancés », **pas** « commandes confirmées » (on ne sait pas si l'appel aboutit) et les bloqueurs de pub sous-comptent un peu.
+- [ ] Faire une **vidéo d'écran de 30 à 60 secondes** : commande préparée sur le site, puis appel lancé avec la liste à l'écran.
 
 **Pas avant l'accord du restaurant** : le **domaine définitif** (IONOS ~1,20 €/an en promo, vérifier le renouvellement) et le **QR code**. Un QR code est imprimé, son adresse ne doit donc plus changer : il pointe vers le domaine, jamais vers `.netlify.app`. Le premier message part avec le lien `.netlify.app` et la vidéo, sans QR code.
 
@@ -22,35 +24,42 @@ Contexte : ils sont en Martinique, je suis en France hexagonale, tout se fait à
 
 ---
 
-## Étape 1 : Premier contact (WhatsApp)
+## Étape 1 : Premier contact
 
-Numéro du restaurant : +596 696 44 41 22 (le même que pour les commandes).
+**Ne pas renvoyer de message WhatsApp** : ils ont écrit qu'ils n'y prennent pas de commande, et leur réponse semble automatique. Le premier contact devient un **appel**, en fin de matinée ou début d'après-midi chez eux, jamais pendant le service.
 
-**Message court** (à adapter) :
-> Bonjour, je suis développeur web. J'ai créé gratuitement un site pour Bambouno Pizza : vos clients voient la carte, choisissent leurs pizzas, et la commande arrive directement sur ce WhatsApp, déjà écrite et rangée. Voici le lien, vous pouvez tester depuis votre téléphone : [lien]. C'est une démo : les prix et les compositions sont à confirmer avec vous. Je peux vous montrer en 10 minutes par téléphone, quand ça vous arrange.
+Numéro du restaurant : +596 696 44 41 22.
 
-**À joindre** : le lien + la vidéo d'écran.
+**Ce que je dis au téléphone** (à adapter, 30 secondes) :
+> Bonjour, je suis développeur web. J'ai créé gratuitement un site pour Bambouno Pizza : vos clients voient la carte à jour, préparent leur commande, puis ils vous appellent et vous la lisent clairement. Ça raccourcit l'appel et ça évite les erreurs. Je peux vous envoyer le lien pour que vous regardiez quand vous avez deux minutes ? C'est une démo : les prix et les compositions sont à confirmer avec vous.
+
+**Question à poser tout de suite** : « Comment préféreriez-vous recevoir les commandes préparées à l'avance ? » Leur réponse décide de la suite (téléphone seul, ou plus tard un autre canal).
+
+**Le lien et la vidéo** : à envoyer **après** l'appel, s'ils sont d'accord, par le canal qu'ils indiquent (SMS, e-mail, ou WhatsApp pour un simple lien, pas pour des commandes).
 
 **Règles**
-- Décalage horaire : 5 à 6 h de moins en Martinique. Écrire en **fin de matinée ou début d'après-midi chez eux**, jamais pendant le service (soir).
-- Pas de long pitch. Un lien, une vidéo, une proposition d'appel.
-- Sans réponse : relancer **une fois** après 3 à 4 jours, pas plus.
+- Décalage horaire : la Martinique est en UTC−4 toute l'année, la France hexagonale en UTC+1 l'hiver et UTC+2 l'été : **5 h de moins l'hiver, 6 h de moins l'été**. Appeler **avant 16 h chez eux** (ils ouvrent à 17h30), soit avant 22 h chez moi en heure d'été.
+- Pas de long pitch : 30 secondes, une question, un lien à envoyer.
+- Sans réponse : rappeler **une fois** quelques jours plus tard, pas plus. Un message écrit n'est lu que si c'est eux qui l'ont demandé.
 
 ---
 
 ## Étape 2 : L'appel / la visio
 
 **Commencer par des questions**, pas par la démo (puis passer la carte en revue : prix, compositions, boissons) :
-- Combien d'appels et de messages un samedi soir ?
+- Combien d'appels un samedi soir ? Combien durent trop longtemps à cause d'une commande mal dictée ?
 - Des erreurs de commande ? Des clients qui n'arrivent pas à vous joindre ?
 - Comment les clients connaissent votre carte aujourd'hui ?
 
-**Puis montrer** : faire passer une vraie commande devant eux et la voir arriver sur leur WhatsApp. C'est le moment qui convainc.
+**Puis montrer** (en visio, ou en envoyant la vidéo) : composer une commande de trois ou quatre plats, ouvrir le panier, et montrer la **liste prête à lire** à côté du bouton « Appeler ». Ce que je vends est un appel plus court et sans erreur, pas la fin du téléphone.
 
 **Bénéfices à mettre en avant** (pas la technique) :
-- Moins d'appels pendant le rush, commandes écrites donc moins d'erreurs.
-- Carte visible sur Google (« pizza Gros-Morne »).
-- Rien ne change dans leur façon de travailler : tout arrive sur WhatsApp.
+- Des appels plus courts pendant le rush : le client sait déjà ce qu'il veut et le lit.
+- Moins d'erreurs de commande (la liste est écrite, dans l'ordre de la carte).
+- Carte à jour visible sur Google (« pizza Gros-Morne »).
+- Rien ne change dans leur façon de travailler : ils continuent de prendre les commandes au téléphone.
+
+**Honnêteté sur la valeur** : le gain est plus faible qu'avec une commande par message. Ne pas promettre de gros volumes. Si ça ne les intéresse pas, s'arrêter là.
 
 ---
 
@@ -69,7 +78,7 @@ Recommandation : **A + essai gratuit**. Ticket d'entrée faible pour eux, revenu
 ### Essai
 
 - **2 mois d'essai gratuit** (un mois est trop court pour juger, l'habitude met du temps à s'installer).
-- **Critère de réussite fixé à l'avance**, par exemple : « au moins 10 commandes par semaine via le site au bout de 6 semaines ».
+- **Critère de réussite fixé à l'avance**, mesurable, par exemple : « au moins 30 appels lancés depuis le panier par semaine au bout de 6 semaines » (chiffre à ajuster avec eux) (clics `call-click`, sous-comptés par les bloqueurs de pub) **et** un avis du restaurant : « les appels sont plus courts / il y a moins d'erreurs ». Les clics ne prouvent pas une commande : demander leur ressenti.
 - Si pas convaincus : je coupe le site, ils n'ont rien perdu.
 
 ### Ce que le restaurant s'engage à faire pendant l'essai
@@ -77,7 +86,7 @@ Recommandation : **A + essai gratuit**. Ticket d'entrée faible pour eux, revenu
 Sans cela l'essai ne prouve rien et finira à tort par « ça ne marche pas » :
 - [ ] Mettre le lien sur la **fiche Google Business**.
 - [ ] Afficher le **QR code** au comptoir et sur les boîtes.
-- [ ] Dire aux clients au téléphone : « Vous pouvez commander directement sur notre site, c'est plus rapide. »
+- [ ] Dire aux clients au téléphone : « Préparez votre commande sur notre site, puis rappelez-nous : c'est plus rapide. »
 - [ ] Faire **un post** Facebook/Instagram avec le lien.
 - [ ] Idée : une petite offre de lancement (boisson offerte pour une commande via le site).
 
@@ -95,7 +104,7 @@ Sans cela l'essai ne prouve rien et finira à tort par « ça ne marche pas » :
 - [ ] **Devis signé par email** avant de commencer : ce qui est inclus, ce qui ne l'est pas, prix, durée de l'essai.
 - [ ] **Domaine au nom du restaurant** (ou règle écrite sur ce qu'il devient si on arrête). Ça les rassure beaucoup.
 - [ ] **Page de mentions légales** sur le site (éditeur = le restaurant, hébergeur, contact).
-- [ ] **RGPD** : déjà bon (prénom stocké dans le navigateur uniquement, Google Maps chargé après un clic, audience sans cookies).
+- [ ] **RGPD** : déjà bon (panier stocké dans le navigateur uniquement, aucun nom ni donnée personnelle demandés, Google Maps chargé après un clic, audience sans cookies).
 - [ ] **TVA** : en micro-entreprise sous le seuil de franchise en base, pas de TVA facturée. À vérifier au moment de créer le statut.
 - [ ] **RC Pro** (responsabilité civile professionnelle) : pas obligatoire, à prendre dès le premier client payant (~100 €/an).
 - [ ] Paiement par **virement**, facture envoyée par email : aucun déplacement nécessaire.
@@ -109,9 +118,9 @@ Sans cela l'essai ne prouve rien et finira à tort par « ça ne marche pas » :
 - Les aider à faire les 4 actions de promotion (Google Business, QR code, phrase au téléphone, post).
 
 **Semaines 2 à 8**
-- Point rapide toutes les 2 semaines (message WhatsApp, 5 lignes) avec les **chiffres réels** : visites, clics « Commander sur WhatsApp ».
+- Point rapide toutes les 2 semaines (appel de 5 minutes, ou message s'ils l'acceptent) avec les **chiffres réels** : visites, clics « Appeler pour commander ».
 - Corriger tout de suite ce qui les gêne (prix, horaires, rupture).
-- Demander leur retour : les commandes reçues sont-elles claires ?
+- Demander leur retour : les appels sont-ils plus courts ? Les commandes lues sont-elles claires ?
 
 **Repères réalistes** (ordres de grandeur, pas des mesures)
 - Site en ligne sans rien faire : quasi aucune commande, même après un mois.
@@ -123,7 +132,7 @@ Sans cela l'essai ne prouve rien et finira à tort par « ça ne marche pas » :
 ## Étape 6 : Transformer l'essai en contrat
 
 À la fin de l'essai :
-1. Envoyer un **bilan en chiffres** (visites, commandes envoyées, évolution).
+1. Envoyer un **bilan en chiffres** (visites, appels lancés, évolution) **et** leur ressenti sur la durée des appels et les erreurs.
 2. Proposer de continuer avec la formule choisie.
 3. Devis accepté, première facture, abonnement mis en place.
 
@@ -135,7 +144,9 @@ Si les chiffres sont faibles, regarder d'abord si le restaurant a fait sa part (
 
 Seulement quand la phase 1 est adoptée **et** que le besoin est prouvé.
 
-**D'abord, pas de développement : modifications par WhatsApp.** Le restaurant écrit « plus de pizza X ce soir » ou « la 4 fromages passe à 13 € », je modifie `src/data/menu.ts` et je pousse (environ 2 minutes). Inclus dans l'abonnement. Pas d'outil à apprendre pour eux, et ils n'ont pas forcément d'ordinateur. Attention aux crédits Netlify : un déploiement coûte 15 crédits, regrouper les modifications quand c'est possible.
+**Réception des commandes sans téléphone** : à ne proposer que si le restaurant le demande. Il faudrait un serveur et un moyen de recevoir (e-mail, ticket imprimé, écran). Payant, avec abonnement relevé, à chiffrer avec eux.
+
+**D'abord, pas de développement : modifications par message** (SMS ou WhatsApp, pour les modifications du site uniquement, pas pour les commandes). Le restaurant écrit « plus de pizza X ce soir » ou « la 4 fromages passe à 13 € », je modifie `src/data/menu.ts` et je pousse (environ 2 minutes). Inclus dans l'abonnement. Pas d'outil à apprendre pour eux, et ils n'ont pas forcément d'ordinateur. Attention aux crédits Netlify : un déploiement coûte 15 crédits, regrouper les modifications quand c'est possible.
 
 **Signal pour passer à la suite** : ils envoient des modifications toutes les semaines pendant l'essai. Sinon, ne rien construire.
 
@@ -171,8 +182,8 @@ Seulement quand la phase 1 est adoptée **et** que le besoin est prouvé.
 
 ## Checklist résumée
 
-1. [ ] Site en ligne sur Netlify, vidéo d'écran (audience + clics WhatsApp : fait)
-2. [ ] Message WhatsApp envoyé avec le lien `.netlify.app` (une relance max)
+1. [ ] Site en ligne sur Netlify (bouton « Appeler pour commander » : fait), vidéo d'écran
+2. [ ] Appel de 30 secondes au restaurant, avant 16 h chez eux (un rappel max), puis envoi du lien `.netlify.app` s'ils sont d'accord
 3. [ ] Appel : questions, revue de la carte (prix, boissons), puis démo en direct
 4. [ ] Offre : formule A, 2 mois d'essai, engagements du restaurant écrits
 5. [ ] Après accord : appel France Travail, micro-entreprise, devis signé, mentions légales, domaine, puis QR code

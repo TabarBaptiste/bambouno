@@ -12,14 +12,12 @@ import { formatPrice, resolveLine } from "@/data/menu";
 import {
   cartCount,
   cartTotal,
-  MAX_NAME_LENGTH,
   orderName,
   sanitize,
   type CartLine,
 } from "@/lib/order";
 
 const STORAGE_KEY = "bambouno.cart.v1";
-const NAME_KEY = "bambouno.name.v1";
 
 type OrderContextValue = {
   lines: CartLine[];
@@ -29,9 +27,6 @@ type OrderContextValue = {
   add: (id: string) => void;
   remove: (id: string) => void;
   clear: () => void;
-  /** Prénom du client, repris dans le message WhatsApp. */
-  name: string;
-  setName: (name: string) => void;
 };
 
 type CartAction = { kind: "add" | "remove"; id: string } | { kind: "clear" };
@@ -47,7 +42,6 @@ function describeCart(lines: CartLine[]): string {
 
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
-  const [name, setName] = useState("");
   // Dernière action, pour l'annonce faite aux lecteurs d'écran.
   const [lastAction, setLastAction] = useState<CartAction | null>(null);
   // Tant que le stockage n'est pas relu, on n'écrit rien : sinon le panier
@@ -56,12 +50,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [loaded, setLoaded] = useState(false);
 
   // La sélection survit à un rechargement : sur mobile, le client quitte
-  // souvent l'onglet pour vérifier quelque chose avant d'envoyer sa commande.
+  // souvent l'onglet pour vérifier quelque chose avant d'appeler.
   useEffect(() => {
     try {
       const stored = window.localStorage.getItem(STORAGE_KEY);
       if (stored) setLines(sanitize(JSON.parse(stored)));
-      setName(window.localStorage.getItem(NAME_KEY)?.slice(0, MAX_NAME_LENGTH) ?? "");
     } catch {
       // Stockage indisponible (navigation privée, quota) : on démarre à vide.
     }
@@ -72,11 +65,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     if (!loaded) return;
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
-      window.localStorage.setItem(NAME_KEY, name);
     } catch {
       // Idem : la persistance est un confort, pas une fonctionnalité critique.
     }
-  }, [lines, name, loaded]);
+  }, [lines, loaded]);
 
   const add = useCallback((id: string) => {
     if (!resolveLine(id)) return;
@@ -124,10 +116,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       add,
       remove,
       clear,
-      name,
-      setName,
     };
-  }, [lines, add, remove, clear, name]);
+  }, [lines, add, remove, clear]);
 
   return (
     <OrderContext.Provider value={value}>

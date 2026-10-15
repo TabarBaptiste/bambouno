@@ -26,8 +26,8 @@ request et chaque push sur `main` :
 
 | Job | Ce qu'il bloque |
 |---|---|
-| Lint, types, tests unitaires, build | ESLint (`next/core-web-vitals` + `jsx-a11y` strict), TypeScript, Vitest (horaires, panier, message WhatsApp, recherche, intégrité de `menu.ts`), `next build` |
-| E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, barre et panneau du panier, recherche, 404), parcours de commande au clavier jusqu'à WhatsApp, prénom obligatoire, commande désactivée hors horaires (horloge du navigateur figée : les tests ne dépendent jamais de l'heure réelle, cf. `e2e/horloge.ts`), persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
+| Lint, types, tests unitaires, build | ESLint (`next/core-web-vitals` + `jsx-a11y` strict), TypeScript, Vitest (horaires, panier, recherche, intégrité de `menu.ts`), `next build` |
+| E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, barre et panneau du panier, recherche, 404), parcours de commande au clavier jusqu'au bouton d'appel, appel désactivé hors horaires (horloge du navigateur figée : les tests ne dépendent jamais de l'heure réelle, cf. `e2e/horloge.ts`), persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
 | Audit | `npm audit` sur les dépendances de production, niveau *high* et plus |
 
 Dependabot propose chaque semaine les mises à jour mineures et correctifs.
@@ -51,11 +51,11 @@ des tests de parcours clavier.
 - Ajouts/retraits au panier et nombre de résultats de recherche annoncés aux
   lecteurs d'écran (régions `role="status"`).
 - Panier dans un `<dialog>` natif modal : focus piégé, Échap pour fermer, focus
-  rendu au bouton « Voir le panier ». Prénom manquant signalé par un message
-  relié au champ (`aria-invalid` + `aria-describedby`).
+  rendu au bouton « Voir le panier ». Hors horaires, l'appel est désactivé et
+  la raison est lue avec le bouton (`aria-describedby`).
 - Pictos d'étiquettes nommés (`role="img"` + `<title>`) : l'information
   n'est pas portée par l'image seule.
-- Liens WhatsApp/itinéraire signalés « nouvel onglet », bouton d'appel nommé
+- Lien d'itinéraire signalé « nouvel onglet », bouton d'appel nommé
   même en icône seule, créole balisé `lang="gcf"`.
 - Cibles tactiles de 40 px minimum, champ de recherche en 16 px sur mobile
   (pas de zoom automatique iOS), recherche insensible aux accents.
@@ -84,20 +84,21 @@ des tests de parcours clavier.
 - **Barre de rubriques collée** sous le header pendant toute la carte : la
   puce de la rubrique à l'écran est mise en avant et se recentre toute seule,
   pour changer de rubrique sans remonter (`src/components/CategoryBar.tsx`).
-- **Commande en deux temps** : la barre basse « Voir le panier » ouvre le
-  panier, où l'on ajuste les quantités et donne son **prénom** (obligatoire),
-  puis « Commander sur WhatsApp » ouvre le message déjà rempli, sans les
-  prix : le restaurant confirme le montant (`src/lib/order.ts`). Liste à plat
-  dans l'ordre de la carte (quel que soit l'ordre des ajouts), chaque plat
-  précédé de son type (« Pizza sucrée À la banane », « Crêpe sucrée
-  Nutella ») : `orderLabel` de chaque rubrique dans `src/data/menu.ts`. Pas
-  d'envoi accidentel. Panier et prénom survivent à un rechargement.
+- **Commande préparée, passée par téléphone** : le restaurant prend ses
+  commandes **par téléphone uniquement** (il l'a dit : pas de WhatsApp). La
+  barre basse « Voir le panier » ouvre le panier, où l'on ajuste les
+  quantités ; « Appeler pour commander » lance l'appel (`tel:`) et le client
+  lit sa liste au restaurant (haut-parleur). Liste à plat dans l'ordre de la
+  carte (quel que soit l'ordre des ajouts), chaque plat précédé de son type
+  (« Pizza sucrée À la banane », « Crêpe sucrée Nutella ») : `orderLabel` de
+  chaque rubrique dans `src/data/menu.ts`. L'appel ne part jamais depuis la
+  barre, seulement depuis le panier. Le panier survit à un rechargement.
   **Hors des horaires d'ouverture**, le site s'utilise normalement (carte,
-  recherche, panier) mais le bouton « Commander sur WhatsApp » est désactivé
+  recherche, panier) mais le bouton « Appeler pour commander » est désactivé
   (`aria-disabled`, donc lisible au clavier et au lecteur d'écran) avec
   « Fermé • Ouvre à 17h30 » ou « Fermé • Ouvre lundi à 17h30 » : personne ne
-  lirait le message avant l'ouverture. Le statut est
-  recalculé chaque minute, y compris panier ouvert.
+  décrocherait. Le statut est recalculé chaque minute, y compris panier
+  ouvert.
 - **Statut ouvert/fermé en temps réel**, calculé dans le fuseau de la Martinique
   et non celui du visiteur (`src/lib/hours.ts`). Libellé minimal : « Ouvert »
   (plus « ferme à 22h » dans la dernière heure) ou « Fermé • Ouvre à 17h30 »,
@@ -117,7 +118,8 @@ des tests de parcours clavier.
 
 Relevées sur la fiche Google Business :
 
-- **Téléphone / WhatsApp** : `+596 696 44 41 22`
+- **Téléphone** : `+596 696 44 41 22` (commandes par appel uniquement, le
+  restaurant ne prend pas de commande sur WhatsApp)
 - **Adresse** : Route nationale, 97213 Gros-Morne, Martinique (Plus code
   `PX7X+25`)
 - **Coordonnées GPS** : `14.7126174, -61.0019799`, relevées sur place
@@ -171,8 +173,9 @@ WhatsApp), au `sitemap.xml` et au `robots.txt`. Sans elle, le site
 retombe sur `http://localhost:3000`.
 
 Définir **`NEXT_PUBLIC_UMAMI_WEBSITE_ID`** pour activer les statistiques
-Umami (sans cookies). Événements suivis : `whatsapp-click` (commande envoyée
-sur WhatsApp) et `whatsapp-closed` (tentative hors horaires). Sans la
+Umami (sans cookies). Événements suivis : `call-click` (clic sur « Appeler pour commander »,
+ce n'est pas une commande confirmée) et `call-closed` (tentative hors
+horaires). Sans la
 variable, aucun script n'est chargé.
 
 ## Phase 2 (si la phase 1 convertit)

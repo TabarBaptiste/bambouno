@@ -1,6 +1,5 @@
 import { menu, resolveLine } from "@/data/menu";
 import { normalize } from "@/lib/search";
-import { site } from "@/data/site";
 
 export type CartLine = { id: string; quantity: number };
 
@@ -68,49 +67,4 @@ export function cartTotal(lines: CartLine[]): number {
 
 export function cartCount(lines: CartLine[]): number {
   return lines.reduce((sum, line) => sum + line.quantity, 0);
-}
-
-/** Longueur maximale du prénom : au-delà, c'est une erreur de saisie. */
-export const MAX_NAME_LENGTH = 40;
-
-/** Prénom nettoyé : espaces superflus retirés, longueur bornée. */
-export function cleanName(name: string): string {
-  return name.replace(/\s+/g, " ").trim().slice(0, MAX_NAME_LENGTH);
-}
-
-/**
- * Message pré-rempli pour WhatsApp. Le prénom permet au restaurant
- * d'appeler le client au retrait ; l'heure se règle dans la conversation.
- * Pas de prix : c'est le restaurant qui confirme le montant. Liste à plat,
- * dans l'ordre de la carte, chaque plat précédé de son type pour se lire seul.
- */
-export function buildOrderMessage(lines: CartLine[], name = ""): string {
-  const rows = sortByMenu(lines)
-    .map((line) => {
-      if (!resolveLine(line.id)) return null;
-      return `• ${line.quantity} × ${orderName(line.id)}`;
-    })
-    .filter(Boolean);
-
-  const firstName = cleanName(name);
-  const greeting = firstName
-    ? `Bonjour ${site.name}, c'est ${firstName}`
-    : `Bonjour ${site.name}`;
-
-  if (rows.length === 0) {
-    return `${greeting}\n\nJe voudrais passer une commande.`;
-  }
-
-  return [
-    greeting,
-    "",
-    "Je voudrais commander :",
-    ...rows,
-    "",
-    "À quelle heure puis-je venir récupérer ?",
-  ].join("\n");
-}
-
-export function whatsappUrl(lines: CartLine[], name = ""): string {
-  return `https://wa.me/${site.whatsapp}?text=${encodeURIComponent(buildOrderMessage(lines, name))}`;
 }
