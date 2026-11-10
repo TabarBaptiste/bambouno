@@ -8,16 +8,16 @@ la vente à emporter uniquement, il n'y a rien à réserver.
 ## Démarrer
 
 ```bash
-npm install
-npm run dev        # http://localhost:3000
-npm run build      # build de production (statique)
-npm run check      # lint + types + tests unitaires, à lancer avant de pousser
-npm run test:e2e   # parcours, accessibilité et responsive (après npm run build)
+pnpm install
+pnpm run dev        # http://localhost:3000
+pnpm run build      # build de production (statique)
+pnpm run check      # lint + types + tests unitaires, à lancer avant de pousser
+pnpm run test:e2e   # parcours, accessibilité et responsive (après pnpm run build)
 ```
 
 Les tests E2E utilisent Playwright (`npx playwright install chromium` la
 première fois). Pour réutiliser un Chromium déjà installé :
-`CHROMIUM_PATH=/chemin/vers/chrome npm run test:e2e`.
+`CHROMIUM_PATH=/chemin/vers/chrome pnpm run test:e2e`.
 
 ## Qualité et CI
 
@@ -28,7 +28,7 @@ request et chaque push sur `main` :
 |---|---|
 | Lint, types, tests unitaires, build | ESLint (`next/core-web-vitals` + `jsx-a11y` strict), TypeScript, Vitest (horaires, panier, message WhatsApp, recherche, intégrité de `menu.ts`), `next build` |
 | E2E | Playwright sur mobile (Pixel 7) et desktop : audit **axe WCAG 2.2 AA** (accueil, barre et panneau du panier, recherche, 404), parcours de commande au clavier jusqu'à WhatsApp, prénom obligatoire, commande désactivée hors horaires (horloge du navigateur figée : les tests ne dépendent jamais de l'heure réelle, cf. `e2e/horloge.ts`), persistance du panier, absence de défilement horizontal de 320 à 1280 px, espacement du texte (WCAG 1.4.12), zoom 400 % |
-| Audit | `npm audit` sur les dépendances de production, niveau *high* et plus |
+| Audit | `pnpm audit` sur les dépendances de production, niveau *high* et plus |
 
 Dependabot propose chaque semaine les mises à jour mineures et correctifs.
 

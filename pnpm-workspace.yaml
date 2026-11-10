@@ -1,0 +1,7 @@
+# Réglages pnpm (équivalent de l'ancien champ "overrides" de package.json avec npm).
+overrides:
+  postcss: ^8.5.23
+
+# unrs-resolver : script de build optionnel (binaires natifs déjà fournis), non exécuté.
+allowBuilds:
+  unrs-resolver: false
